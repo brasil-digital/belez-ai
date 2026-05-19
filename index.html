@@ -454,84 +454,85 @@ html,body{height:100%;overflow:hidden;background:var(--black);font-family:'DM Sa
 </div>
 
 <!-- ══════════ PAYMENT ══════════ -->
-<div class="screen hidden" id="s-payment">
-  <div class="pay-header">
-    <div class="pay-header-logo">BELEZ<span>-AI</span></div>
-    <div class="pay-title">Escolha sua forma de pagamento</div>
-    <div class="pay-sub">Análise completa · Resultado em minutos</div>
-  </div>
+<div class="screen hidden" id="s-payment" style="overflow:hidden;">
+  <div style="width:100%;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;">
 
-  <div class="pay-tabs">
-    <div class="pay-tab active" id="tab-pix" onclick="switchTab('pix')">🇧🇷 PIX · R$25</div>
-    <div class="pay-tab" id="tab-venmo" onclick="switchTab('venmo')">🇺🇸 Venmo · $5</div>
-  </div>
+    <div class="pay-header">
+      <div class="pay-header-logo">BELEZ<span>-AI</span></div>
+      <div class="pay-title">Forma de pagamento</div>
+      <div class="pay-sub">Análise completa · Resultado em minutos</div>
+    </div>
 
-  <div class="pay-body">
+    <!-- TABS -->
+    <div style="display:flex;gap:0;margin:20px 20px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+      <div class="pay-tab active" id="tab-pix" onclick="switchTab('pix')" style="flex:1;padding:14px 8px;">🇧🇷 PIX · R$25</div>
+      <div class="pay-tab" id="tab-venmo" onclick="switchTab('venmo')" style="flex:1;padding:14px 8px;">🇺🇸 Venmo · $5</div>
+    </div>
 
-    <!-- PIX -->
-    <div id="pix-panel">
-      <div class="pix-card">
-        <div class="pix-amount">R$ 25,00</div>
-        <div class="pix-amount-label" style="margin-bottom:16px;">ANÁLISE FACIAL COMPLETA</div>
+    <div class="pay-body">
 
-        <div class="qr-wrap">
-          <img id="pix-qr-img" alt="QR Code PIX" style="width:100%;height:100%;border-radius:4px;">
-        </div>
-        <div style="font-size:11px;color:#888;margin-bottom:12px;">Escaneie com o app do seu banco</div>
-
-        <div class="pix-key-box">
-          <div style="flex:1;">
-            <div class="pix-key-label">CHAVE PIX</div>
-            <div class="pix-key-val" id="pixKeyDisplay">SUA_CHAVE_PIX_AQUI</div>
+      <!-- PIX -->
+      <div id="pix-panel">
+        <div class="pix-card">
+          <div class="pix-amount">R$ 25,00</div>
+          <div class="pix-amount-label" style="margin-bottom:16px;">ANÁLISE FACIAL COMPLETA</div>
+          <div class="qr-wrap">
+            <img id="pix-qr-img" alt="QR Code PIX" style="width:100%;height:100%;border-radius:4px;">
           </div>
-          <button class="copy-btn" onclick="copyPix()">COPIAR</button>
+          <div style="font-size:11px;color:#888;margin-bottom:12px;">Escaneie com o app do seu banco</div>
+          <div class="pix-key-box">
+            <div style="flex:1;">
+              <div class="pix-key-label">CHAVE PIX</div>
+              <div class="pix-key-val" id="pixKeyDisplay">SUA_CHAVE_PIX_AQUI</div>
+            </div>
+            <button class="copy-btn" onclick="copyPix()">COPIAR</button>
+          </div>
+        </div>
+        <div class="after-pay">
+          <div class="after-title">✓ APÓS O PAGAMENTO</div>
+          <input class="name-input" id="payerName" type="text" placeholder="Seu nome completo" autocomplete="name">
+          <button class="btn-whatsapp" onclick="sendWhatsApp()">
+            <span style="font-size:18px;">💬</span> ENVIAR COMPROVANTE VIA WHATSAPP
+          </button>
+          <div class="or-divider">ou insira o código recebido</div>
+          <div class="code-input-wrap">
+            <input class="code-input" id="codeInput" type="text" placeholder="CÓDIGO DE ACESSO" maxlength="8" oninput="this.value=this.value.toUpperCase()">
+            <button class="btn-unlock" onclick="validateCode()">LIBERAR</button>
+          </div>
         </div>
       </div>
 
-      <div class="after-pay">
-        <div class="after-title">✓ APÓS O PAGAMENTO</div>
-        <input class="name-input" id="payerName" type="text" placeholder="Seu nome completo" autocomplete="name">
-        <button class="btn-whatsapp" onclick="sendWhatsApp()">
-          <span style="font-size:18px;">💬</span> ENVIAR COMPROVANTE VIA WHATSAPP
-        </button>
-        <div class="or-divider">ou insira o código recebido</div>
-        <div class="code-input-wrap">
-          <input class="code-input" id="codeInput" type="text" placeholder="CÓDIGO DE ACESSO" maxlength="8" oninput="this.value=this.value.toUpperCase()">
-          <button class="btn-unlock" onclick="validateCode()">LIBERAR</button>
+      <!-- VENMO -->
+      <div id="venmo-panel" style="display:none;">
+        <div class="venmo-card">
+          <div style="font-size:11px;color:var(--text-dim);letter-spacing:1px;margin-bottom:4px;">VALOR</div>
+          <div class="venmo-amount">$5.00 USD</div>
+          <div class="venmo-icon">💙</div>
+          <div class="venmo-handle" id="venmoHandle">@SEU_VENMO_AQUI</div>
+          <div class="venmo-desc">Send $5 via Venmo with note<br><strong>"BELEZ-AI Facial Analysis"</strong></div>
+          <button class="btn-venmo" onclick="openVenmo()">OPEN VENMO →</button>
+        </div>
+        <div class="after-pay">
+          <div class="after-title">✓ AFTER PAYMENT</div>
+          <input class="name-input" id="payerNameVenmo" type="text" placeholder="Your full name" autocomplete="name">
+          <button class="btn-whatsapp" onclick="sendWhatsAppVenmo()">
+            <span style="font-size:18px;">💬</span> SEND RECEIPT VIA WHATSAPP
+          </button>
+          <div class="or-divider">or enter your access code</div>
+          <div class="code-input-wrap">
+            <input class="code-input" id="codeInputVenmo" type="text" placeholder="ACCESS CODE" maxlength="8" oninput="this.value=this.value.toUpperCase()">
+            <button class="btn-unlock" onclick="validateCodeVenmo()">UNLOCK</button>
+          </div>
         </div>
       </div>
+
     </div>
 
-    <!-- VENMO -->
-    <div id="venmo-panel" style="display:none;">
-      <div class="venmo-card">
-        <div style="font-size:11px;color:var(--text-dim);letter-spacing:1px;margin-bottom:4px;">VALOR</div>
-        <div class="venmo-amount">$5.00 USD</div>
-        <div class="venmo-icon">💙</div>
-        <div class="venmo-handle" id="venmoHandle">@SEU_VENMO_AQUI</div>
-        <div class="venmo-desc">Envie $5 pelo Venmo com a nota<br><strong>"BELEZ-AI Facial Analysis"</strong></div>
-        <button class="btn-venmo" onclick="openVenmo()">ABRIR VENMO →</button>
-      </div>
-
-      <div class="after-pay">
-        <div class="after-title">✓ APÓS O PAGAMENTO</div>
-        <input class="name-input" id="payerNameVenmo" type="text" placeholder="Seu nome completo" autocomplete="name">
-        <button class="btn-whatsapp" onclick="sendWhatsAppVenmo()">
-          <span style="font-size:18px;">💬</span> ENVIAR COMPROVANTE VIA WHATSAPP
-        </button>
-        <div class="or-divider">ou insira o código recebido</div>
-        <div class="code-input-wrap">
-          <input class="code-input" id="codeInputVenmo" type="text" placeholder="CÓDIGO DE ACESSO" maxlength="8" oninput="this.value=this.value.toUpperCase()">
-          <button class="btn-unlock" onclick="validateCodeVenmo()">LIBERAR</button>
-        </div>
-      </div>
+    <div style="padding:20px 20px 40px;">
+      <button class="btn-outline" style="width:100%;" onclick="goTo('s-details')">← VOLTAR</button>
     </div>
 
   </div>
-  <div style="height:20px;"></div>
-
-  <button class="btn-outline" style="width:calc(100% - 40px);margin:0 20px 32px;" onclick="goTo('s-details')">← VOLTAR</button>
-  <div style="height:20px;"></div>
 </div>
 
 <!-- ══════════ SCAN ══════════ -->
