@@ -43,13 +43,21 @@ html,body{height:100%;overflow:hidden;background:var(--black);font-family:'DM Sa
 .screen::-webkit-scrollbar{display:none;}
 .screen.hidden{opacity:0;pointer-events:none;transform:translateY(16px);}
 
-/* ══ SCREEN: INTRO ══ */
-#s-intro{justify-content:flex-start;padding:0;}
+/* ══ SCREEN: HERO ══ */
+#s-intro{justify-content:space-between;padding:0;overflow:hidden;}
+.hero-top{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px 0;}
+.hero-logo{width:min(320px,80vw);height:min(320px,80vw);}
+.hero-logo img{width:100%;height:100%;object-fit:contain;}
+.hero-tagline{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:300;letter-spacing:2px;color:rgba(240,244,255,0.7);text-align:center;margin-top:-8px;}
+.hero-bottom{width:100%;padding:20px 24px 44px;display:flex;flex-direction:column;align-items:center;gap:12px;background:linear-gradient(0deg,rgba(0,0,0,0.95) 70%,transparent);}
+.btn-entrar{width:100%;height:64px;border-radius:20px;border:none;cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;letter-spacing:4px;color:var(--black);background:linear-gradient(135deg,var(--gold-light),var(--gold),#a8742a);box-shadow:0 8px 40px rgba(201,168,76,0.5);transition:transform .15s,box-shadow .15s;position:relative;overflow:hidden;}
+.btn-entrar:active{transform:scale(0.97);}
+.btn-entrar::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.2),transparent);opacity:0;transition:opacity .2s;}
+.btn-entrar:hover::before{opacity:1;}
+.hero-sub{font-size:11px;letter-spacing:2px;color:var(--text-dim);text-align:center;opacity:.7;}
 
-.intro-hero{width:100%;padding:36px 24px 16px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:0;position:relative;}
-
-/* Logo */
-.logo-svg-wrap{width:min(260px,55vw);height:min(260px,55vw);position:relative;margin-bottom:8px;}
+/* Logo SVG */
+.logo-svg-wrap{width:180px;height:180px;position:relative;margin-bottom:16px;}
 .logo-svg-wrap svg{width:100%;height:100%;}
 
 /* Gold ring animation */
@@ -315,17 +323,10 @@ html,body{height:100%;overflow:hidden;background:var(--black);font-family:'DM Sa
 .btn-outline:active{border-color:var(--gold);background:rgba(201,168,76,0.07);}
 
 /* ══ MOBILE RESPONSIVE ══ */
-@media (max-height: 750px) {
-  .intro-hero{padding:20px 24px 10px;}
-  .logo-svg-wrap{width:min(200px,48vw);height:min(200px,48vw);}
-  .gold-div{margin:10px auto;}
-  .intro-desc{font-size:15px;}
-}
-@media (max-height: 650px) {
-  .logo-svg-wrap{width:min(160px,42vw);height:min(160px,42vw);}
-  .gold-div{margin:6px auto;}
-  .feat-card{padding:10px 8px;}
-  .feat-em{font-size:20px;margin-bottom:4px;}
+@media (max-height: 700px) {
+  .hero-logo{width:min(240px,70vw);height:min(240px,70vw);}
+  .btn-entrar{height:56px;font-size:20px;}
+  .hero-bottom{padding:16px 24px 36px;}
 }
 
 /* Toast */
@@ -376,64 +377,80 @@ html,body{height:100%;overflow:hidden;background:var(--black);font-family:'DM Sa
 <body>
 <div class="bg-fx"></div>
 
-<!-- ══════════ INTRO ══════════ -->
+<!-- ══════════ HERO ══════════ -->
 <div class="screen" id="s-intro">
-  <div class="intro-hero">
-    <div class="logo-svg-wrap" onclick="adminTap()" style="cursor:default;">
-      <img src="logo.png" alt="BELEZ-AI" style="width:100%;height:100%;object-fit:contain;">
+  <div class="hero-top">
+    <div class="hero-logo" onclick="adminTap()">
+      <img src="logo.png" alt="BELEZ-AI">
     </div>
-
+    <div class="hero-tagline">Inteligência que realça o que é único</div>
   </div>
-
-  <div class="gold-div"></div>
-
-  <div class="intro-desc">
-    Escaneie seu rosto e receba um diagnóstico completo da sua saúde facial com IA de última geração.
+  <div class="hero-bottom">
+    <button class="btn-entrar" onclick="goTo('s-details')">ENTRAR</button>
+    <div class="hero-sub">BELEZA COM INTELIGÊNCIA ARTIFICIAL · FEITO NO BRASIL</div>
   </div>
+</div>
 
-  <div style="height:16px;"></div>
+<!-- ══════════ DETALHES ══════════ -->
+<div class="screen hidden" id="s-details">
+  <div style="width:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:20px;">
 
-  <div class="feat-row">
-    <div class="feat-card">
-      <div class="feat-em">🔬</div>
-      <div class="feat-title">Pele & Rugas</div>
-      <div class="feat-desc">Análise profunda da textura e envelhecimento</div>
+    <div class="pay-header" style="padding-top:52px;">
+      <div class="pay-header-logo">BELEZ<span>-AI</span></div>
+      <div class="pay-title">Diagnóstico Facial com IA</div>
+      <div class="pay-sub">Resultado completo e personalizado em minutos</div>
     </div>
-    <div class="feat-card">
-      <div class="feat-em">💎</div>
-      <div class="feat-title">Estética</div>
-      <div class="feat-desc">Procedimentos indicados para você</div>
+
+    <div style="padding:20px 20px 8px;">
+      <div class="feat-row" style="padding:0;">
+        <div class="feat-card">
+          <div class="feat-em">🔬</div>
+          <div class="feat-title">Pele & Rugas</div>
+          <div class="feat-desc">Textura, hidratação e envelhecimento</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-em">💎</div>
+          <div class="feat-title">Estética</div>
+          <div class="feat-desc">Procedimentos indicados para você</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-em">😁</div>
+          <div class="feat-title">Dental</div>
+          <div class="feat-desc">Saúde e estética do sorriso</div>
+        </div>
+      </div>
     </div>
-    <div class="feat-card">
-      <div class="feat-em">😁</div>
-      <div class="feat-title">Dental</div>
-      <div class="feat-desc">Saúde e estética do seu sorriso</div>
+
+    <div style="padding:0 20px;">
+      <div class="price-badge">
+        <div class="price-item">
+          <div class="price-val">R$25</div>
+          <div class="price-curr">PIX · BRASIL</div>
+        </div>
+        <div class="price-sep"></div>
+        <div class="price-item">
+          <div class="price-val" style="color:var(--cyan);">$5</div>
+          <div class="price-curr">VENMO · USA</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding:10px 20px 4px;">
+      <div class="price-note">Análise completa gerada por IA com relatório personalizado. Pagamento único, resultado imediato.</div>
+    </div>
+
+    <div style="padding:16px 20px 0;">
+      <button class="btn-gold" style="width:100%;" onclick="goTo('s-payment')">✦ INICIAR ANÁLISE · PAGAR AGORA</button>
+    </div>
+
+    <div style="padding:12px 20px 4px;">
+      <div class="disclaimer">As análises têm caráter informativo e educativo. Consulte sempre um profissional habilitado.</div>
+    </div>
+
+    <div style="padding:8px 20px 16px;">
+      <button class="btn-outline" style="width:100%;" onclick="goTo('s-intro')">← VOLTAR</button>
     </div>
   </div>
-
-  <div style="height:16px;"></div>
-
-  <div class="price-badge">
-    <div class="price-item">
-      <div class="price-val">R$25</div>
-      <div class="price-curr">PIX · BRASIL</div>
-    </div>
-    <div class="price-sep"></div>
-    <div class="price-item">
-      <div class="price-val" style="color:var(--cyan);">$5</div>
-      <div class="price-curr">VENMO · USA</div>
-    </div>
-  </div>
-
-  <div style="height:12px;"></div>
-  <div class="price-note">Análise completa e profissional com relatório personalizado gerado por IA. Pagamento único, resultado imediato.</div>
-  <div style="height:16px;"></div>
-
-  <button class="btn-gold" onclick="goTo('s-payment')">✦ INICIAR ANÁLISE FACIAL</button>
-
-  <div style="height:12px;"></div>
-  <div class="disclaimer">As análises têm caráter informativo e educativo. Consulte sempre um profissional de saúde habilitado para diagnósticos e tratamentos.</div>
-  <div style="height:32px;"></div>
 </div>
 
 <!-- ══════════ PAYMENT ══════════ -->
@@ -513,7 +530,7 @@ html,body{height:100%;overflow:hidden;background:var(--black);font-family:'DM Sa
   </div>
   <div style="height:20px;"></div>
 
-  <button class="btn-outline" style="width:calc(100% - 40px);margin:0 20px 32px;" onclick="goTo('s-intro')">← VOLTAR</button>
+  <button class="btn-outline" style="width:calc(100% - 40px);margin:0 20px 32px;" onclick="goTo('s-details')">← VOLTAR</button>
   <div style="height:20px;"></div>
 </div>
 
