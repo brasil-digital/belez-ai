@@ -364,55 +364,10 @@ html,body{height:100%;overflow:hidden;background:var(--black);font-family:'DM Sa
 <!-- ══════════ INTRO ══════════ -->
 <div class="screen" id="s-intro">
   <div class="intro-hero">
-    <!-- Logo SVG baseado na identidade do logo -->
-    <div class="logo-svg-wrap" onclick="adminTap()" style="cursor:default;">
-      <svg viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <!-- Outer gold ring rotating -->
-        <g class="ring-spin" style="transform-origin:90px 90px">
-          <circle cx="90" cy="90" r="82" stroke="#c9a84c" stroke-width="1" stroke-dasharray="6 4" opacity=".5"/>
-        </g>
-        <!-- Middle ring -->
-        <circle cx="90" cy="90" r="70" stroke="#c9a84c" stroke-width="1.5" opacity=".7"/>
-        <!-- Scanner bracket corners -->
-        <path d="M58 50 L50 50 L50 58" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M122 50 L130 50 L130 58" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M58 130 L50 130 L50 122" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M122 130 L130 130 L130 122" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-        <!-- Face silhouette -->
-        <path d="M90 40 C72 40 60 56 60 74 C60 90 66 100 76 108 C78 112 78 118 76 122 L104 122 C102 118 102 112 104 108 C114 100 120 90 120 74 C120 56 108 40 90 40Z" fill="none" stroke="#c9a84c" stroke-width="1.5" opacity=".6"/>
-        <!-- Dot mesh on face -->
-        <circle cx="80" cy="68" r="1.5" fill="#00d4ff" class="ring-pulse"/>
-        <circle cx="90" cy="63" r="1.5" fill="#00d4ff" class="ring-pulse" style="animation-delay:.3s"/>
-        <circle cx="100" cy="68" r="1.5" fill="#00d4ff" class="ring-pulse" style="animation-delay:.6s"/>
-        <circle cx="84" cy="78" r="1.5" fill="#c9a84c" class="ring-pulse" style="animation-delay:.2s"/>
-        <circle cx="96" cy="78" r="1.5" fill="#c9a84c" class="ring-pulse" style="animation-delay:.5s"/>
-        <circle cx="90" cy="86" r="1.5" fill="#00d4ff" class="ring-pulse" style="animation-delay:.8s"/>
-        <circle cx="83" cy="96" r="1.5" fill="#c9a84c" class="ring-pulse" style="animation-delay:.1s"/>
-        <circle cx="97" cy="96" r="1.5" fill="#c9a84c" class="ring-pulse" style="animation-delay:.4s"/>
-        <!-- Connect dots -->
-        <line x1="80" y1="68" x2="90" y2="63" stroke="rgba(0,212,255,.3)" stroke-width="1"/>
-        <line x1="90" y1="63" x2="100" y2="68" stroke="rgba(0,212,255,.3)" stroke-width="1"/>
-        <line x1="80" y1="68" x2="84" y2="78" stroke="rgba(201,168,76,.3)" stroke-width="1"/>
-        <line x1="100" y1="68" x2="96" y2="78" stroke="rgba(201,168,76,.3)" stroke-width="1"/>
-        <line x1="84" y1="78" x2="90" y2="86" stroke="rgba(0,212,255,.3)" stroke-width="1"/>
-        <line x1="96" y1="78" x2="90" y2="86" stroke="rgba(0,212,255,.3)" stroke-width="1"/>
-        <!-- Scan line animated -->
-        <line x1="55" y1="85" x2="125" y2="85" stroke="url(#scanGrad)" stroke-width="1.5" class="ring-pulse" opacity=".8"/>
-        <defs>
-          <linearGradient id="scanGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="transparent"/>
-            <stop offset="40%" stop-color="#c9a84c"/>
-            <stop offset="60%" stop-color="#00d4ff"/>
-            <stop offset="100%" stop-color="transparent"/>
-          </linearGradient>
-        </defs>
-      </svg>
+    <div class="logo-svg-wrap" onclick="adminTap()" style="cursor:default;width:260px;height:260px;">
+      <img src="logo.png" alt="BELEZ-AI" style="width:100%;height:100%;object-fit:contain;">
     </div>
 
-    <div class="brand-name"><span class="b">BELEZ</span><span class="ai">-AI</span></div>
-    <div class="brand-tagline">Beleza com Inteligência Artificial</div>
-    <div class="brand-sub">TECNOLOGIA • BELEZA • CONFIANÇA • INOVAÇÃO</div>
-    <div class="brand-sub" style="margin-top:4px;font-size:10px;opacity:.5;">✦ FEITO NO BRASIL ✦</div>
   </div>
 
   <div class="gold-div"></div>
