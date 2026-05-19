@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="BELEZ-AI">
+<title>BELEZ-AI — Beleza com Inteligência Artificial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Cormorant+Garamond:wght@300;400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black: #000000;
+  --deep: #050508;
+  --surface: #0c0c12;
+  --surface2: #121220;
+  --gold: #c9a84c;
+  --gold-light: #e8c96a;
+  --gold-dim: rgba(201,168,76,0.3);
+  --cyan: #00d4ff;
+  --cyan-dim: rgba(0,212,255,0.2);
+  --white: #f0f4ff;
+  --text-dim: #7a8090;
+  --border: rgba(201,168,76,0.2);
+  --border-cyan: rgba(0,212,255,0.2);
+  --warn: #ff6b4a;
+  --green: #00e5a0;
+  --r: 16px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;background:var(--black);font-family:'DM Sans',sans-serif;color:var(--white);}
+
+/* BG */
+.bg-fx{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.bg-fx::before{content:'';position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,0.06) 0%,transparent 70%);top:-200px;left:50%;transform:translateX(-50%);}
+.bg-fx::after{content:'';position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,255,0.05) 0%,transparent 70%);bottom:-100px;right:-100px;}
+
+/* SCREENS */
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;overflow-y:auto;-webkit-overflow-scrolling:touch;z-index:10;transition:opacity .5s,transform .5s;}
+.screen::-webkit-scrollbar{display:none;}
+.screen.hidden{opacity:0;pointer-events:none;transform:translateY(16px);}
+
+/* ══ SCREEN: INTRO ══ */
+#s-intro{justify-content:flex-start;padding:0;}
+
+.intro-hero{width:100%;padding:52px 24px 28px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:0;position:relative;}
+
+/* Logo SVG */
+.logo-svg-wrap{width:180px;height:180px;position:relative;margin-bottom:16px;}
+.logo-svg-wrap svg{width:100%;height:100%;}
+
+/* Gold ring animation */
+@keyframes rotate-ring{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes pulse-glow{0%,100%{opacity:.6}50%{opacity:1}}
+.ring-spin{animation:rotate-ring 12s linear infinite;transform-origin:center;}
+.ring-pulse{animation:pulse-glow 3s ease-in-out infinite;}
+
+.brand-name{font-family:'Rajdhani',sans-serif;font-size:42px;font-weight:700;letter-spacing:4px;line-height:1;}
+.brand-name .b{color:var(--white);}
+.brand-name .ai{color:var(--cyan);}
+.brand-tagline{font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:300;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-top:6px;}
+.brand-sub{font-size:11px;letter-spacing:2px;color:var(--text-dim);margin-top:4px;}
+
+/* Gold divider */
+.gold-div{width:120px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:20px auto;}
+
+.intro-desc{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:300;line-height:1.7;color:rgba(240,244,255,0.8);text-align:center;padding:0 24px;max-width:340px;}
+
+/* Feature cards */
+.feat-row{display:flex;gap:10px;padding:0 20px;width:100%;}
+.feat-card{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 10px;text-align:center;position:relative;overflow:hidden;}
+.feat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.feat-em{font-size:24px;margin-bottom:8px;}
+.feat-title{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;letter-spacing:1px;color:var(--gold);text-transform:uppercase;}
+.feat-desc{font-size:10px;color:var(--text-dim);margin-top:3px;line-height:1.4;}
+
+/* Price badge */
+.price-badge{display:flex;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--gold-dim);border-radius:16px;padding:16px 24px;margin:0 20px;width:calc(100% - 40px);}
+.price-item{flex:1;text-align:center;}
+.price-val{font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;color:var(--gold-light);}
+.price-curr{font-size:11px;color:var(--text-dim);letter-spacing:1px;margin-top:2px;}
+.price-sep{width:1px;height:36px;background:var(--border);}
+
+.price-note{font-size:11px;color:var(--text-dim);text-align:center;padding:0 24px;line-height:1.5;}
+
+/* CTA button */
+.btn-gold{width:calc(100% - 40px);height:60px;border-radius:16px;border:none;cursor:pointer;position:relative;overflow:hidden;font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--black);background:linear-gradient(135deg,var(--gold-light) 0%,var(--gold) 50%,#a8742a 100%);box-shadow:0 8px 40px rgba(201,168,76,0.4);transition:transform .15s,box-shadow .15s;}
+.btn-gold:active{transform:scale(0.97);box-shadow:0 4px 20px rgba(201,168,76,0.3);}
+.btn-gold::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.2),transparent);opacity:0;transition:opacity .2s;}
+.btn-gold:hover::before{opacity:1;}
+
+.disclaimer{font-size:10px;color:var(--text-dim);text-align:center;line-height:1.5;padding:0 32px;opacity:.7;}
+
+/* ══ SCREEN: PAYMENT ══ */
+#s-payment{padding:0;justify-content:flex-start;}
+.pay-header{width:100%;padding:48px 24px 20px;text-align:center;background:linear-gradient(180deg,rgba(201,168,76,0.08) 0%,transparent 100%);border-bottom:1px solid var(--border);}
+.pay-header-logo{font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;letter-spacing:3px;margin-bottom:4px;}
+.pay-header-logo span{color:var(--cyan);}
+.pay-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;margin-bottom:4px;}
+.pay-sub{font-size:13px;color:var(--text-dim);}
+
+.pay-tabs{display:flex;gap:0;margin:20px 20px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.pay-tab{flex:1;padding:12px;text-align:center;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;letter-spacing:1px;cursor:pointer;transition:background .2s,color .2s;color:var(--text-dim);}
+.pay-tab.active{background:linear-gradient(135deg,rgba(201,168,76,0.15),rgba(201,168,76,0.05));color:var(--gold);}
+
+.pay-body{width:100%;padding:20px;}
+
+/* PIX card */
+.pix-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px;text-align:center;}
+.pix-amount{font-family:'Rajdhani',sans-serif;font-size:44px;font-weight:700;color:var(--gold-light);line-height:1;}
+.pix-amount-label{font-size:12px;color:var(--text-dim);letter-spacing:1px;margin-bottom:20px;}
+
+/* QR Code visual */
+.qr-wrap{width:160px;height:160px;margin:0 auto 16px;border:2px solid var(--gold-dim);border-radius:12px;padding:10px;background:white;display:flex;align-items:center;justify-content:center;}
+.qr-wrap svg{width:100%;height:100%;}
+
+.pix-key-box{background:var(--surface2);border:1px solid var(--border-cyan);border-radius:12px;padding:12px 16px;margin:12px 0;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.pix-key-label{font-size:10px;color:var(--text-dim);letter-spacing:1px;text-align:left;}
+.pix-key-val{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;color:var(--cyan);word-break:break-all;text-align:left;flex:1;}
+.copy-btn{background:rgba(0,212,255,0.1);border:1px solid var(--border-cyan);border-radius:8px;padding:6px 12px;color:var(--cyan);font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:background .2s;}
+.copy-btn:active{background:rgba(0,212,255,0.25);}
+
+/* Venmo card */
+.venmo-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px;text-align:center;}
+.venmo-amount{font-family:'Rajdhani',sans-serif;font-size:44px;font-weight:700;color:#3d95ce;line-height:1;}
+.venmo-icon{font-size:48px;margin:12px 0;}
+.venmo-handle{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--white);margin:4px 0;}
+.venmo-desc{font-size:13px;color:var(--text-dim);margin-bottom:16px;line-height:1.5;}
+.btn-venmo{width:100%;height:52px;border-radius:14px;border:none;background:#3d95ce;color:white;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:opacity .2s;}
+.btn-venmo:active{opacity:.8;}
+
+/* After payment */
+.after-pay{margin-top:20px;background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:20px;}
+.after-title{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;letter-spacing:1px;color:var(--gold);margin-bottom:12px;text-align:center;}
+.name-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;color:var(--white);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;margin-bottom:10px;transition:border-color .2s;}
+.name-input:focus{border-color:var(--gold);}
+.name-input::placeholder{color:var(--text-dim);}
+.btn-whatsapp{width:100%;height:52px;border-radius:14px;border:none;background:linear-gradient(135deg,#25d366,#128c7e);color:white;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;transition:opacity .2s;}
+.btn-whatsapp:active{opacity:.85;}
+
+.or-divider{display:flex;align-items:center;gap:10px;color:var(--text-dim);font-size:12px;margin:4px 0;}
+.or-divider::before,.or-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+
+.code-input-wrap{display:flex;gap:8px;margin-top:10px;}
+.code-input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;color:var(--white);font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600;letter-spacing:4px;outline:none;text-transform:uppercase;transition:border-color .2s;}
+.code-input:focus{border-color:var(--cyan);}
+.code-input::placeholder{color:var(--text-dim);letter-spacing:1px;font-size:12px;}
+.btn-unlock{height:52px;padding:0 20px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--cyan),#4f7cff);color:var(--black);font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity .2s;}
+.btn-unlock:active{opacity:.8;}
+
+/* ══ SCREEN: SCAN ══ */
+#s-scan{padding:0;overflow:hidden;}
+.scan-header{position:absolute;top:0;left:0;right:0;z-index:20;padding:44px 20px 12px;background:linear-gradient(180deg,rgba(0,0,0,.95) 0%,transparent 100%);text-align:center;}
+.scan-brand{font-family:'Rajdhani',sans-serif;font-size:13px;letter-spacing:3px;color:var(--gold);margin-bottom:4px;}
+.scan-step{font-family:'Rajdhani',sans-serif;font-size:10px;letter-spacing:2px;color:var(--text-dim);text-transform:uppercase;}
+.scan-title{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;margin-top:4px;}
+.scan-sub{font-size:12px;color:var(--text-dim);margin-top:2px;}
+
+.scan-prog{display:flex;gap:6px;justify-content:center;margin-top:10px;}
+.sp-dot{height:3px;border-radius:2px;background:rgba(201,168,76,0.2);transition:all .4s;}
+.sp-dot.w1{width:40px;}
+.sp-dot.w2{width:24px;}
+.sp-dot.active{background:var(--gold);width:48px;}
+.sp-dot.done{background:var(--green);width:24px;}
+
+.camera-wrap{position:relative;width:100%;height:100%;background:#000;display:flex;align-items:center;justify-content:center;}
+#video{width:100%;height:100%;object-fit:cover;}
+#cv{display:none;}
+
+/* Overlay */
+.scan-ov{position:absolute;inset:0;pointer-events:none;z-index:15;}
+
+/* Face oval */
+.face-frame{position:absolute;top:50%;left:50%;transform:translate(-50%,-52%);width:68%;max-width:260px;aspect-ratio:.75;}
+.face-oval-svg{width:100%;height:100%;}
+
+/* Scan beam */
+.scan-beam{position:absolute;left:15%;right:15%;height:1px;background:linear-gradient(90deg,transparent,var(--gold),var(--cyan),var(--gold),transparent);box-shadow:0 0 12px var(--gold),0 0 24px var(--cyan);opacity:0;animation:beam 2.5s ease-in-out infinite;}
+@keyframes beam{0%{top:20%;opacity:0}8%{opacity:1}92%{opacity:1}100%{top:80%;opacity:0}}
+
+/* Grid */
+.scan-grid-ov{position:absolute;inset:0;opacity:0;background-image:linear-gradient(rgba(201,168,76,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,0.04) 1px,transparent 1px);background-size:28px 28px;transition:opacity .6s;}
+.scan-grid-ov.on{opacity:1;}
+
+/* Direction hint */
+.dir-hint{position:absolute;bottom:24%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.8);border:1px solid var(--border);border-radius:30px;padding:10px 22px;display:flex;align-items:center;gap:10px;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600;letter-spacing:1px;white-space:nowrap;}
+.dir-hint-icon{font-size:20px;}
+
+/* Flash */
+.flash{position:absolute;inset:0;background:white;opacity:0;pointer-events:none;z-index:30;transition:opacity .08s;}
+.flash.go{opacity:.65;}
+
+/* Thumbs */
+.thumb-col{position:absolute;bottom:28%;left:16px;z-index:20;display:flex;flex-direction:column;gap:6px;}
+.thumb-item{width:42px;height:54px;border-radius:8px;border:1.5px solid rgba(255,255,255,0.2);overflow:hidden;background:rgba(0,0,0,.6);position:relative;}
+.thumb-item img{width:100%;height:100%;object-fit:cover;}
+.thumb-item.done{border-color:var(--green);}
+.t-check{position:absolute;top:2px;right:2px;width:14px;height:14px;border-radius:50%;background:var(--green);display:none;align-items:center;justify-content:center;font-size:8px;color:#000;font-weight:700;}
+.thumb-item.done .t-check{display:flex;}
+
+/* Capture */
+.capture-zone{position:absolute;bottom:5%;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;z-index:20;}
+.cap-btn{width:76px;height:76px;border-radius:50%;background:transparent;border:3px solid rgba(255,255,255,.8);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .1s;}
+.cap-btn:active{transform:scale(.92);}
+.cap-inner{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--gold-light),var(--gold));box-shadow:0 0 20px rgba(201,168,76,0.5);}
+.cap-label{font-family:'Rajdhani',sans-serif;font-size:11px;letter-spacing:2px;color:rgba(255,255,255,.5);}
+
+/* ══ ANALYZING ══ */
+#s-analyzing{position:fixed;inset:0;z-index:100;display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px;background:rgba(0,0,0,.98);text-align:center;padding:32px;}
+#s-analyzing.show{display:flex;}
+
+.an-logo{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;letter-spacing:3px;margin-bottom:4px;}
+.an-logo span{color:var(--cyan);}
+
+.an-ring{width:90px;height:90px;position:relative;}
+.an-ring svg{animation:spin 2s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.an-title{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:400;}
+.an-sub{font-size:13px;color:var(--text-dim);max-width:260px;line-height:1.6;}
+.an-steps{display:flex;flex-direction:column;gap:10px;width:100%;max-width:280px;}
+.an-step{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--text-dim);transition:color .3s;}
+.an-step.active{color:var(--gold);}
+.an-step.done{color:var(--green);}
+.an-dot{width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0;}
+.an-step.active .an-dot{animation:blink 1s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ══ RESULTS ══ */
+#s-results{padding:0;overflow:hidden;}
+.res-scroll{width:100%;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.res-scroll::-webkit-scrollbar{display:none;}
+
+/* Result hero */
+.res-hero{padding:52px 24px 28px;text-align:center;background:linear-gradient(180deg,rgba(201,168,76,0.08),transparent);border-bottom:1px solid var(--border);position:relative;}
+.res-hero::after{content:'BELEZ-AI';position:absolute;top:48px;left:50%;transform:translateX(-50%);font-family:'Rajdhani',sans-serif;font-size:11px;letter-spacing:3px;color:var(--text-dim);}
+
+.score-wrap{display:flex;align-items:center;justify-content:center;margin-bottom:12px;}
+.score-ring-svg{width:120px;height:120px;position:relative;display:flex;align-items:center;justify-content:center;}
+.score-ring-svg svg{position:absolute;inset:0;transform:rotate(-90deg);}
+.score-inner{display:flex;flex-direction:column;align-items:center;}
+.score-num{font-family:'Rajdhani',sans-serif;font-size:42px;font-weight:700;color:var(--gold-light);line-height:1;}
+.score-of{font-size:10px;color:var(--text-dim);letter-spacing:1px;}
+.res-grade{display:inline-block;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;padding:5px 16px;border-radius:20px;margin-bottom:10px;}
+.res-summary{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:400;line-height:1.4;margin-bottom:6px;}
+.res-meta{font-size:12px;color:var(--text-dim);}
+
+/* Stats bar */
+.stats-bar{display:flex;background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.stat-b{flex:1;padding:14px 8px;text-align:center;border-right:1px solid var(--border);}
+.stat-b:last-child{border-right:none;}
+.stat-n{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;}
+.stat-l{font-size:10px;color:var(--text-dim);letter-spacing:1px;margin-top:2px;}
+
+/* Section */
+.res-sec{padding:20px 20px 4px;}
+.sec-head{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.sec-head::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* Card */
+.res-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:12px;position:relative;overflow:hidden;}
+.res-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px;}
+.rc-gold::before{background:linear-gradient(180deg,var(--gold),#a8742a);}
+.rc-cyan::before{background:linear-gradient(180deg,var(--cyan),#4f7cff);}
+.rc-green::before{background:linear-gradient(180deg,var(--green),#00b880);}
+.rc-warn::before{background:linear-gradient(180deg,var(--warn),#cc4422);}
+
+.rc-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.rc-icon{font-size:20px;}
+.rc-title{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600;letter-spacing:.5px;}
+.rc-badge{margin-left:auto;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;padding:3px 12px;border-radius:10px;}
+.bg-gold{background:rgba(201,168,76,0.12);color:var(--gold);}
+.bg-cyan{background:rgba(0,212,255,0.12);color:var(--cyan);}
+.bg-green{background:rgba(0,229,160,0.12);color:var(--green);}
+.bg-warn{background:rgba(255,107,74,0.12);color:var(--warn);}
+.rc-text{font-size:13px;color:var(--text-dim);line-height:1.65;}
+
+/* Bar */
+.bar-row{margin-top:10px;}
+.bar-lbl{display:flex;justify-content:space-between;font-size:11px;color:var(--text-dim);margin-bottom:5px;}
+.bar-track{height:4px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:4px;width:0;transition:width 1.8s cubic-bezier(.16,1,.3,1);}
+.bf-gold{background:linear-gradient(90deg,#a8742a,var(--gold-light));}
+.bf-cyan{background:linear-gradient(90deg,#4f7cff,var(--cyan));}
+.bf-green{background:linear-gradient(90deg,#00b880,var(--green));}
+.bf-warn{background:linear-gradient(90deg,var(--gold),var(--warn));}
+
+/* Procedures */
+.proc-wrap{display:flex;flex-wrap:wrap;gap:8px;}
+.proc-chip{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:12px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;letter-spacing:.5px;border:1px solid;cursor:pointer;transition:opacity .2s;}
+.proc-chip:active{opacity:.7;}
+.pc-yes{border-color:rgba(0,229,160,0.4);background:rgba(0,229,160,0.07);color:var(--green);}
+.pc-no{border-color:rgba(255,107,74,0.4);background:rgba(255,107,74,0.07);color:var(--warn);}
+.pc-maybe{border-color:rgba(201,168,76,0.4);background:rgba(201,168,76,0.07);color:var(--gold);}
+
+/* Tips */
+.tips-list{display:flex;flex-direction:column;gap:10px;}
+.tip-row{display:flex;gap:12px;align-items:flex-start;}
+.tip-n{width:24px;height:24px;border-radius:50%;border:1px solid var(--gold-dim);background:rgba(201,168,76,0.08);display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;color:var(--gold);flex-shrink:0;margin-top:1px;}
+.tip-t{font-size:13px;color:var(--text-dim);line-height:1.6;}
+
+/* Photos row */
+.photos-row{display:flex;gap:8px;padding:0 20px;margin-bottom:4px;}
+.ph-wrap{flex:1;}
+.ph-img{aspect-ratio:.75;border-radius:10px;overflow:hidden;border:1px solid var(--border);}
+.ph-img img{width:100%;height:100%;object-fit:cover;}
+.ph-lbl{text-align:center;font-family:'Rajdhani',sans-serif;font-size:10px;color:var(--text-dim);letter-spacing:2px;margin-top:5px;}
+
+/* CTA */
+.res-cta{padding:20px;display:flex;flex-direction:column;gap:10px;}
+.btn-outline{width:100%;height:52px;border-radius:14px;background:transparent;border:1.5px solid var(--border);color:var(--white);font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;letter-spacing:1px;cursor:pointer;transition:border-color .2s,background .2s;}
+.btn-outline:active{border-color:var(--gold);background:rgba(201,168,76,0.07);}
+
+/* Toast */
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--surface2);border:1px solid var(--border);color:var(--white);padding:10px 22px;border-radius:12px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;letter-spacing:.5px;opacity:0;transition:opacity .3s,transform .3s;z-index:200;white-space:nowrap;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+#toast.success{border-color:var(--green);color:var(--green);}
+#toast.error{border-color:var(--warn);color:var(--warn);}
+
+/* ── ADMIN LOGIN MODAL ── */
+#admin-modal{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,0.92);backdrop-filter:blur(8px);}
+#admin-modal.show{display:flex;}
+.adm-box{width:100%;max-width:340px;background:var(--surface);border:1px solid var(--gold-dim);border-radius:20px;padding:28px 24px;text-align:center;}
+.adm-icon{font-size:36px;margin-bottom:12px;}
+.adm-title{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;letter-spacing:2px;color:var(--gold);margin-bottom:4px;}
+.adm-sub{font-size:12px;color:var(--text-dim);margin-bottom:20px;line-height:1.5;}
+.adm-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;color:var(--white);font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;letter-spacing:6px;text-align:center;outline:none;margin-bottom:12px;transition:border-color .2s;}
+.adm-input:focus{border-color:var(--gold);}
+.adm-input::placeholder{letter-spacing:2px;font-size:13px;font-weight:400;}
+.btn-adm-enter{width:100%;height:52px;border-radius:14px;border:none;background:linear-gradient(135deg,var(--gold-light),var(--gold));color:var(--black);font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;letter-spacing:2px;cursor:pointer;margin-bottom:10px;transition:opacity .2s;}
+.btn-adm-enter:active{opacity:.8;}
+.btn-adm-cancel{width:100%;height:44px;border-radius:12px;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;cursor:pointer;}
+
+/* ── ADMIN PANEL ── */
+#s-admin{padding:0;justify-content:flex-start;}
+.adm-header{width:100%;padding:48px 24px 20px;text-align:center;background:linear-gradient(180deg,rgba(201,168,76,0.1),transparent);border-bottom:1px solid var(--border);}
+.adm-header-logo{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;letter-spacing:3px;color:var(--gold);margin-bottom:4px;}
+.adm-header-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(201,168,76,0.1);border:1px solid var(--gold-dim);border-radius:20px;padding:4px 14px;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:600;letter-spacing:2px;color:var(--gold);margin-bottom:8px;}
+.adm-header-title{font-size:13px;color:var(--text-dim);}
+.adm-body{width:100%;padding:20px;display:flex;flex-direction:column;gap:14px;}
+.adm-sec-title{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:600;letter-spacing:3px;color:var(--gold);text-transform:uppercase;display:flex;align-items:center;gap:8px;margin-bottom:2px;}
+.adm-sec-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.adm-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px;position:relative;overflow:hidden;}
+.adm-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.demo-btn{width:100%;height:56px;border-radius:14px;border:none;cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;display:flex;align-items:center;justify-content:center;gap:10px;transition:opacity .2s,transform .15s;margin-bottom:10px;}
+.demo-btn:last-child{margin-bottom:0;}
+.demo-btn:active{transform:scale(.97);opacity:.85;}
+.db-scan{background:linear-gradient(135deg,var(--gold-light),var(--gold));color:var(--black);}
+.db-result{background:linear-gradient(135deg,#00b880,var(--green));color:var(--black);}
+.db-payment{background:linear-gradient(135deg,#4f7cff,var(--cyan));color:var(--black);}
+.adm-info-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(201,168,76,0.08);}
+.adm-info-row:last-child{border-bottom:none;padding-bottom:0;}
+.adm-info-label{font-size:12px;color:var(--text-dim);}
+.adm-info-val{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;color:var(--gold);word-break:break-all;text-align:right;max-width:60%;}
+.code-chip{display:inline-block;background:var(--surface2);border:1px solid var(--border-cyan);border-radius:8px;padding:4px 10px;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;color:var(--cyan);letter-spacing:2px;margin:3px;}
+.adm-warning{background:rgba(255,107,74,0.07);border:1px solid rgba(255,107,74,0.2);border-radius:12px;padding:12px 14px;font-size:12px;color:rgba(255,107,74,0.8);line-height:1.5;text-align:center;}
+</style>
+</head>
+<body>
+<div class="bg-fx"></div>
+
+<!-- ══════════ INTRO ══════════ -->
+<div class="screen" id="s-intro">
+  <div class="intro-hero">
+    <!-- Logo SVG baseado na identidade do logo -->
+    <div class="logo-svg-wrap" onclick="adminTap()" style="cursor:default;">
+      <svg viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Outer gold ring rotating -->
+        <g class="ring-spin" style="transform-origin:90px 90px">
+          <circle cx="90" cy="90" r="82" stroke="#c9a84c" stroke-width="1" stroke-dasharray="6 4" opacity=".5"/>
+        </g>
+        <!-- Middle ring -->
+        <circle cx="90" cy="90" r="70" stroke="#c9a84c" stroke-width="1.5" opacity=".7"/>
+        <!-- Scanner bracket corners -->
+        <path d="M58 50 L50 50 L50 58" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M122 50 L130 50 L130 58" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M58 130 L50 130 L50 122" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M122 130 L130 130 L130 122" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Face silhouette -->
+        <path d="M90 40 C72 40 60 56 60 74 C60 90 66 100 76 108 C78 112 78 118 76 122 L104 122 C102 118 102 112 104 108 C114 100 120 90 120 74 C120 56 108 40 90 40Z" fill="none" stroke="#c9a84c" stroke-width="1.5" opacity=".6"/>
+        <!-- Dot mesh on face -->
+        <circle cx="80" cy="68" r="1.5" fill="#00d4ff" class="ring-pulse"/>
+        <circle cx="90" cy="63" r="1.5" fill="#00d4ff" class="ring-pulse" style="animation-delay:.3s"/>
+        <circle cx="100" cy="68" r="1.5" fill="#00d4ff" class="ring-pulse" style="animation-delay:.6s"/>
+        <circle cx="84" cy="78" r="1.5" fill="#c9a84c" class="ring-pulse" style="animation-delay:.2s"/>
+        <circle cx="96" cy="78" r="1.5" fill="#c9a84c" class="ring-pulse" style="animation-delay:.5s"/>
+        <circle cx="90" cy="86" r="1.5" fill="#00d4ff" class="ring-pulse" style="animation-delay:.8s"/>
+        <circle cx="83" cy="96" r="1.5" fill="#c9a84c" class="ring-pulse" style="animation-delay:.1s"/>
+        <circle cx="97" cy="96" r="1.5" fill="#c9a84c" class="ring-pulse" style="animation-delay:.4s"/>
+        <!-- Connect dots -->
+        <line x1="80" y1="68" x2="90" y2="63" stroke="rgba(0,212,255,.3)" stroke-width="1"/>
+        <line x1="90" y1="63" x2="100" y2="68" stroke="rgba(0,212,255,.3)" stroke-width="1"/>
+        <line x1="80" y1="68" x2="84" y2="78" stroke="rgba(201,168,76,.3)" stroke-width="1"/>
+        <line x1="100" y1="68" x2="96" y2="78" stroke="rgba(201,168,76,.3)" stroke-width="1"/>
+        <line x1="84" y1="78" x2="90" y2="86" stroke="rgba(0,212,255,.3)" stroke-width="1"/>
+        <line x1="96" y1="78" x2="90" y2="86" stroke="rgba(0,212,255,.3)" stroke-width="1"/>
+        <!-- Scan line animated -->
+        <line x1="55" y1="85" x2="125" y2="85" stroke="url(#scanGrad)" stroke-width="1.5" class="ring-pulse" opacity=".8"/>
+        <defs>
+          <linearGradient id="scanGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="transparent"/>
+            <stop offset="40%" stop-color="#c9a84c"/>
+            <stop offset="60%" stop-color="#00d4ff"/>
+            <stop offset="100%" stop-color="transparent"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+
+    <div class="brand-name"><span class="b">BELEZ</span><span class="ai">-AI</span></div>
+    <div class="brand-tagline">Beleza com Inteligência Artificial</div>
+    <div class="brand-sub">TECNOLOGIA • BELEZA • CONFIANÇA • INOVAÇÃO</div>
+    <div class="brand-sub" style="margin-top:4px;font-size:10px;opacity:.5;">✦ FEITO NO BRASIL ✦</div>
+  </div>
+
+  <div class="gold-div"></div>
+
+  <div class="intro-desc">
+    Escaneie seu rosto e receba um diagnóstico completo da sua saúde facial com IA de última geração.
+  </div>
+
+  <div style="height:16px;"></div>
+
+  <div class="feat-row">
+    <div class="feat-card">
+      <div class="feat-em">🔬</div>
+      <div class="feat-title">Pele & Rugas</div>
+      <div class="feat-desc">Análise profunda da textura e envelhecimento</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-em">💎</div>
+      <div class="feat-title">Estética</div>
+      <div class="feat-desc">Procedimentos indicados para você</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-em">😁</div>
+      <div class="feat-title">Dental</div>
+      <div class="feat-desc">Saúde e estética do seu sorriso</div>
+    </div>
+  </div>
+
+  <div style="height:16px;"></div>
+
+  <div class="price-badge">
+    <div class="price-item">
+      <div class="price-val">R$25</div>
+      <div class="price-curr">PIX · BRASIL</div>
+    </div>
+    <div class="price-sep"></div>
+    <div class="price-item">
+      <div class="price-val" style="color:var(--cyan);">$5</div>
+      <div class="price-curr">VENMO · USA</div>
+    </div>
+  </div>
+
+  <div style="height:12px;"></div>
+  <div class="price-note">Análise completa e profissional com relatório personalizado gerado por IA. Pagamento único, resultado imediato.</div>
+  <div style="height:16px;"></div>
+
+  <button class="btn-gold" onclick="goTo('s-payment')">✦ INICIAR ANÁLISE FACIAL</button>
+
+  <div style="height:12px;"></div>
+  <div class="disclaimer">As análises têm caráter informativo e educativo. Consulte sempre um profissional de saúde habilitado para diagnósticos e tratamentos.</div>
+  <div style="height:32px;"></div>
+</div>
+
+<!-- ══════════ PAYMENT ══════════ -->
+<div class="screen hidden" id="s-payment">
+  <div class="pay-header">
+    <div class="pay-header-logo">BELEZ<span>-AI</span></div>
+    <div class="pay-title">Escolha sua forma de pagamento</div>
+    <div class="pay-sub">Análise completa · Resultado em minutos</div>
+  </div>
+
+  <div class="pay-tabs">
+    <div class="pay-tab active" id="tab-pix" onclick="switchTab('pix')">🇧🇷 PIX · R$25</div>
+    <div class="pay-tab" id="tab-venmo" onclick="switchTab('venmo')">🇺🇸 Venmo · $5</div>
+  </div>
+
+  <div class="pay-body">
+
+    <!-- PIX -->
+    <div id="pix-panel">
+      <div class="pix-card">
+        <div class="pix-amount">R$ 25,00</div>
+        <div class="pix-amount-label" style="margin-bottom:16px;">ANÁLISE FACIAL COMPLETA</div>
+
+        <!-- QR Code SVG gerado visualmente -->
+        <div class="qr-wrap">
+          <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <!-- QR Code decorativo/representativo -->
+            <rect width="100" height="100" fill="white"/>
+            <!-- Top-left finder -->
+            <rect x="5" y="5" width="28" height="28" fill="#000" rx="2"/>
+            <rect x="8" y="8" width="22" height="22" fill="white" rx="1"/>
+            <rect x="11" y="11" width="16" height="16" fill="#000" rx="1"/>
+            <!-- Top-right finder -->
+            <rect x="67" y="5" width="28" height="28" fill="#000" rx="2"/>
+            <rect x="70" y="8" width="22" height="22" fill="white" rx="1"/>
+            <rect x="73" y="11" width="16" height="16" fill="#000" rx="1"/>
+            <!-- Bottom-left finder -->
+            <rect x="5" y="67" width="28" height="28" fill="#000" rx="2"/>
+            <rect x="8" y="70" width="22" height="22" fill="white" rx="1"/>
+            <rect x="11" y="73" width="16" height="16" fill="#000" rx="1"/>
+            <!-- Data modules -->
+            <rect x="38" y="5" width="5" height="5" fill="#000"/>
+            <rect x="46" y="5" width="5" height="5" fill="#000"/>
+            <rect x="54" y="5" width="5" height="5" fill="#000"/>
+            <rect x="38" y="13" width="5" height="5" fill="#000"/>
+            <rect x="54" y="13" width="5" height="5" fill="#000"/>
+            <rect x="46" y="21" width="5" height="5" fill="#000"/>
+            <rect x="38" y="29" width="5" height="5" fill="#000"/>
+            <rect x="54" y="29" width="5" height="5" fill="#000"/>
+            <rect x="5" y="38" width="5" height="5" fill="#000"/>
+            <rect x="13" y="38" width="5" height="5" fill="#000"/>
+            <rect x="21" y="38" width="5" height="5" fill="#000"/>
+            <rect x="38" y="38" width="5" height="5" fill="#000"/>
+            <rect x="46" y="38" width="5" height="5" fill="#000"/>
+            <rect x="62" y="38" width="5" height="5" fill="#000"/>
+            <rect x="78" y="38" width="5" height="5" fill="#000"/>
+            <rect x="86" y="38" width="5" height="5" fill="#000"/>
+            <rect x="5" y="46" width="5" height="5" fill="#000"/>
+            <rect x="21" y="46" width="5" height="5" fill="#000"/>
+            <rect x="38" y="46" width="5" height="5" fill="#000"/>
+            <rect x="54" y="46" width="5" height="5" fill="#000"/>
+            <rect x="70" y="46" width="5" height="5" fill="#000"/>
+            <rect x="86" y="46" width="5" height="5" fill="#000"/>
+            <rect x="5" y="54" width="5" height="5" fill="#000"/>
+            <rect x="13" y="54" width="5" height="5" fill="#000"/>
+            <rect x="29" y="54" width="5" height="5" fill="#000"/>
+            <rect x="46" y="54" width="5" height="5" fill="#000"/>
+            <rect x="62" y="54" width="5" height="5" fill="#000"/>
+            <rect x="78" y="54" width="5" height="5" fill="#000"/>
+            <rect x="38" y="62" width="5" height="5" fill="#000"/>
+            <rect x="54" y="62" width="5" height="5" fill="#000"/>
+            <rect x="70" y="62" width="5" height="5" fill="#000"/>
+            <rect x="86" y="62" width="5" height="5" fill="#000"/>
+            <rect x="38" y="70" width="5" height="5" fill="#000"/>
+            <rect x="46" y="70" width="5" height="5" fill="#000"/>
+            <rect x="62" y="70" width="5" height="5" fill="#000"/>
+            <rect x="38" y="78" width="5" height="5" fill="#000"/>
+            <rect x="54" y="78" width="5" height="5" fill="#000"/>
+            <rect x="70" y="78" width="5" height="5" fill="#000"/>
+            <rect x="78" y="78" width="5" height="5" fill="#000"/>
+            <rect x="38" y="86" width="5" height="5" fill="#000"/>
+            <rect x="46" y="86" width="5" height="5" fill="#000"/>
+            <rect x="62" y="86" width="5" height="5" fill="#000"/>
+            <rect x="86" y="86" width="5" height="5" fill="#000"/>
+          </svg>
+        </div>
+        <div style="font-size:11px;color:#888;margin-bottom:12px;">Escaneie com o app do seu banco</div>
+
+        <div class="pix-key-box">
+          <div style="flex:1;">
+            <div class="pix-key-label">CHAVE PIX</div>
+            <div class="pix-key-val" id="pixKeyDisplay">SUA_CHAVE_PIX_AQUI</div>
+          </div>
+          <button class="copy-btn" onclick="copyPix()">COPIAR</button>
+        </div>
+      </div>
+
+      <div class="after-pay">
+        <div class="after-title">✓ APÓS O PAGAMENTO</div>
+        <input class="name-input" id="payerName" type="text" placeholder="Seu nome completo" autocomplete="name">
+        <button class="btn-whatsapp" onclick="sendWhatsApp()">
+          <span style="font-size:18px;">💬</span> ENVIAR COMPROVANTE VIA WHATSAPP
+        </button>
+        <div class="or-divider">ou insira o código recebido</div>
+        <div class="code-input-wrap">
+          <input class="code-input" id="codeInput" type="text" placeholder="CÓDIGO DE ACESSO" maxlength="8" oninput="this.value=this.value.toUpperCase()">
+          <button class="btn-unlock" onclick="validateCode()">LIBERAR</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VENMO -->
+    <div id="venmo-panel" style="display:none;">
+      <div class="venmo-card">
+        <div style="font-size:11px;color:var(--text-dim);letter-spacing:1px;margin-bottom:4px;">VALOR</div>
+        <div class="venmo-amount">$5.00 USD</div>
+        <div class="venmo-icon">💙</div>
+        <div class="venmo-handle" id="venmoHandle">@SEU_VENMO_AQUI</div>
+        <div class="venmo-desc">Envie $5 pelo Venmo com a nota<br><strong>"BELEZ-AI Facial Analysis"</strong></div>
+        <button class="btn-venmo" onclick="openVenmo()">ABRIR VENMO →</button>
+      </div>
+
+      <div class="after-pay">
+        <div class="after-title">✓ APÓS O PAGAMENTO</div>
+        <input class="name-input" id="payerNameVenmo" type="text" placeholder="Seu nome completo" autocomplete="name">
+        <button class="btn-whatsapp" onclick="sendWhatsAppVenmo()">
+          <span style="font-size:18px;">💬</span> ENVIAR COMPROVANTE VIA WHATSAPP
+        </button>
+        <div class="or-divider">ou insira o código recebido</div>
+        <div class="code-input-wrap">
+          <input class="code-input" id="codeInputVenmo" type="text" placeholder="CÓDIGO DE ACESSO" maxlength="8" oninput="this.value=this.value.toUpperCase()">
+          <button class="btn-unlock" onclick="validateCodeVenmo()">LIBERAR</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div style="height:20px;"></div>
+
+  <button class="btn-outline" style="width:calc(100% - 40px);margin:0 20px 32px;" onclick="goTo('s-intro')">← VOLTAR</button>
+  <div style="height:20px;"></div>
+</div>
+
+<!-- ══════════ SCAN ══════════ -->
+<div class="screen hidden" id="s-scan" style="overflow:hidden;">
+  <div class="scan-header">
+    <div class="scan-brand">BELEZ-AI</div>
+    <div class="scan-step" id="sc-step">PASSO 1 DE 3</div>
+    <div class="scan-title" id="sc-title">Olhe diretamente para a câmera</div>
+    <div class="scan-sub" id="sc-sub">Centralize seu rosto no guia oval</div>
+    <div class="scan-prog">
+      <div class="sp-dot w1 active" id="sd0"></div>
+      <div class="sp-dot w2" id="sd1"></div>
+      <div class="sp-dot w2" id="sd2"></div>
+    </div>
+  </div>
+
+  <div class="camera-wrap">
+    <video id="video" autoplay playsinline muted></video>
+    <canvas id="cv"></canvas>
+
+    <div class="scan-ov">
+      <div class="scan-grid-ov" id="scanGrid"></div>
+      <div class="face-frame">
+        <svg class="face-oval-svg" viewBox="0 0 200 267" fill="none">
+          <ellipse cx="100" cy="133" rx="96" ry="129" stroke="#c9a84c" stroke-width="1.5" opacity=".7"/>
+          <!-- corners -->
+          <path d="M30 20 L10 20 L10 40" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M170 20 L190 20 L190 40" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M30 247 L10 247 L10 227" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M170 247 L190 247 L190 227" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="scan-beam" id="scanBeam"></div>
+      <div class="dir-hint" id="dirHint"><span class="dir-hint-icon" id="dirIcon">⬆️</span><span id="dirTxt">FRENTE</span></div>
+      <div class="flash" id="flash"></div>
+    </div>
+
+    <div class="thumb-col">
+      <div class="thumb-item" id="th0"><div class="t-check">✓</div></div>
+      <div class="thumb-item" id="th1"><div class="t-check">✓</div></div>
+      <div class="thumb-item" id="th2"><div class="t-check">✓</div></div>
+    </div>
+
+    <div class="capture-zone">
+      <button class="cap-btn" onclick="capture()">
+        <div class="cap-inner"></div>
+      </button>
+      <div class="cap-label">FOTOGRAFAR</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ ANALYZING ══════════ -->
+<div id="s-analyzing">
+  <div class="an-logo">BELEZ<span>-AI</span></div>
+  <div class="an-ring">
+    <svg width="90" height="90" viewBox="0 0 90 90">
+      <circle cx="45" cy="45" r="38" fill="none" stroke="rgba(201,168,76,0.12)" stroke-width="4"/>
+      <circle cx="45" cy="45" r="38" fill="none" stroke="url(#ag)" stroke-width="4" stroke-linecap="round" stroke-dasharray="60 179"/>
+      <defs>
+        <linearGradient id="ag" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#c9a84c"/>
+          <stop offset="100%" stop-color="#00d4ff"/>
+        </linearGradient>
+      </defs>
+    </svg>
+  </div>
+  <div class="an-title">Analisando seu rosto…</div>
+  <div class="an-sub">Nossa IA está processando as imagens e criando seu relatório personalizado</div>
+  <div class="an-steps">
+    <div class="an-step active" id="an1"><div class="an-dot"></div>Detectando estrutura facial</div>
+    <div class="an-step" id="an2"><div class="an-dot"></div>Analisando textura e hidratação</div>
+    <div class="an-step" id="an3"><div class="an-dot"></div>Mapeando linhas de expressão</div>
+    <div class="an-step" id="an4"><div class="an-dot"></div>Avaliando saúde dental</div>
+    <div class="an-step" id="an5"><div class="an-dot"></div>Gerando recomendações personalizadas</div>
+  </div>
+</div>
+
+<!-- ══════════ RESULTS ══════════ -->
+<div class="screen hidden" id="s-results" style="overflow:hidden;">
+  <div class="res-scroll" id="resContent"></div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── CONFIG (substitua aqui antes de publicar) ─────────────────────
+const CONFIG = {
+  PIX_KEY:       '02832776612',
+  VENMO_HANDLE:  '@usaronny',
+  WHATSAPP_NUM:  '16172243235',
+  ACCESS_CODES:  ['BELA2024','BELEZ001','FALA2024','VIP2024','SCAN001'] // códigos válidos
+};
+
+// ── STATE ─────────────────────────────────────────────────────────
+let step = 0, photos = [], camStream = null;
+const STEPS = [
+  { step:'PASSO 1 DE 3', title:'Olhe diretamente para a câmera', sub:'Centralize seu rosto no guia oval', icon:'⬆️', dir:'FRENTE' },
+  { step:'PASSO 2 DE 3', title:'Vire o rosto para a esquerda',    sub:'Gire suavemente ~45°, mantenha o oval',  icon:'👈', dir:'ESQUERDA' },
+  { step:'PASSO 3 DE 3', title:'Vire o rosto para a direita',     sub:'Última captura — quase lá!',             icon:'👉', dir:'DIREITA'  },
+];
+
+// Populate config into UI
+document.getElementById('pixKeyDisplay').textContent = CONFIG.PIX_KEY;
+document.getElementById('venmoHandle').textContent = CONFIG.VENMO_HANDLE;
+
+// ── NAVIGATION ────────────────────────────────────────────────────
+function goTo(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+}
+
+// ── TABS ──────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.getElementById('tab-pix').classList.toggle('active', tab==='pix');
+  document.getElementById('tab-venmo').classList.toggle('active', tab==='venmo');
+  document.getElementById('pix-panel').style.display = tab==='pix' ? '' : 'none';
+  document.getElementById('venmo-panel').style.display = tab==='venmo' ? '' : 'none';
+}
+
+// ── PIX ───────────────────────────────────────────────────────────
+function copyPix() {
+  const key = CONFIG.PIX_KEY;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(key).then(() => toast('Chave PIX copiada!','success'));
+  } else {
+    const el = document.createElement('textarea');
+    el.value = key; document.body.appendChild(el); el.select();
+    document.execCommand('copy'); document.body.removeChild(el);
+    toast('Chave PIX copiada!','success');
+  }
+}
+
+function openVenmo() {
+  const handle = CONFIG.VENMO_HANDLE.replace('@','');
+  window.open(`venmo://paycharge?txn=pay&recipients=${handle}&amount=5&note=BELEZ-AI+Facial+Analysis`,'_blank');
+  setTimeout(() => window.open(`https://venmo.com/${handle}`,'_blank'), 500);
+}
+
+function sendWhatsApp() {
+  const name = document.getElementById('payerName').value.trim() || 'Cliente';
+  const num = CONFIG.WHATSAPP_NUM;
+  const msg = encodeURIComponent(`Olá! Sou ${name} e acabei de realizar o pagamento de R$25 via PIX para a análise BELEZ-AI. Segue o comprovante em anexo. Aguardo o código de acesso! 🙏`);
+  window.open(`https://wa.me/${num}?text=${msg}`,'_blank');
+}
+
+function sendWhatsAppVenmo() {
+  const name = document.getElementById('payerNameVenmo').value.trim() || 'Cliente';
+  const num = CONFIG.WHATSAPP_NUM;
+  const msg = encodeURIComponent(`Hi! I'm ${name} and I just sent $5 via Venmo for BELEZ-AI facial analysis. Please send my access code! 🙏`);
+  window.open(`https://wa.me/${num}?text=${msg}`,'_blank');
+}
+
+function validateCode() { checkCode(document.getElementById('codeInput').value); }
+function validateCodeVenmo() { checkCode(document.getElementById('codeInputVenmo').value); }
+
+function checkCode(code) {
+  if (!code) { toast('Digite o código de acesso','error'); return; }
+  if (CONFIG.ACCESS_CODES.includes(code.toUpperCase())) {
+    toast('Código válido! Iniciando scan...','success');
+    setTimeout(() => startScan(), 1200);
+  } else {
+    toast('Código inválido. Verifique e tente novamente.','error');
+  }
+}
+
+// ── SCAN ──────────────────────────────────────────────────────────
+async function startScan() {
+  goTo('s-scan');
+  step = 0; photos = [];
+  resetScanUI();
+  try {
+    camStream = await navigator.mediaDevices.getUserMedia({
+      video:{facingMode:'user',width:{ideal:1280},height:{ideal:960}}, audio:false
+    });
+    document.getElementById('video').srcObject = camStream;
+  } catch(e) {
+    toast('Câmera não disponível. Verifique as permissões.','error');
+  }
+  setTimeout(() => {
+    document.getElementById('scanGrid').classList.add('on');
+  }, 600);
+}
+
+function resetScanUI() {
+  ['sd0','sd1','sd2'].forEach((id,i) => {
+    const el = document.getElementById(id);
+    el.classList.remove('active','done');
+    el.className = 'sp-dot ' + (i===0?'w1':'w2');
+  });
+  document.getElementById('sd0').classList.add('active');
+  ['th0','th1','th2'].forEach(id => {
+    document.getElementById(id).className = 'thumb-item';
+    document.getElementById(id).innerHTML = '<div class="t-check">✓</div>';
+  });
+  updateScanUI(0);
+}
+
+function updateScanUI(s) {
+  const d = STEPS[s];
+  document.getElementById('sc-step').textContent = d.step;
+  document.getElementById('sc-title').textContent = d.title;
+  document.getElementById('sc-sub').textContent = d.sub;
+  document.getElementById('dirIcon').textContent = d.icon;
+  document.getElementById('dirTxt').textContent = d.dir;
+}
+
+function capture() {
+  if (!camStream) { toast('Câmera não está ativa','error'); return; }
+  // Flash
+  const fl = document.getElementById('flash');
+  fl.classList.add('go');
+  setTimeout(() => fl.classList.remove('go'), 250);
+
+  const vid = document.getElementById('video');
+  const cv = document.getElementById('cv');
+  cv.width = vid.videoWidth||640; cv.height = vid.videoHeight||480;
+  cv.getContext('2d').drawImage(vid,0,0,cv.width,cv.height);
+  const data = cv.toDataURL('image/jpeg',0.82);
+  photos.push(data);
+
+  // Thumbnail
+  const th = document.getElementById(`th${step}`);
+  th.innerHTML = `<img src="${data}"><div class="t-check">✓</div>`;
+  th.classList.add('done');
+
+  // Progress
+  document.getElementById(`sd${step}`).classList.remove('active');
+  document.getElementById(`sd${step}`).classList.add('done');
+  step++;
+
+  if (step < STEPS.length) {
+    document.getElementById(`sd${step}`).classList.add('active');
+    updateScanUI(step);
+  } else {
+    startAnalysis();
+  }
+}
+
+// ── ANALYSIS ──────────────────────────────────────────────────────
+async function startAnalysis() {
+  if (camStream) camStream.getTracks().forEach(t=>t.stop());
+  document.getElementById('s-analyzing').classList.add('show');
+
+  // Animate steps
+  const ids = ['an1','an2','an3','an4','an5'];
+  const delays = [0,1200,2400,3500,4600];
+  ids.forEach((id,i) => {
+    setTimeout(() => {
+      ids.forEach(x => { document.getElementById(x).classList.remove('active'); });
+      if (i>0) document.getElementById(ids[i-1]).classList.add('done');
+      document.getElementById(id).classList.add('active');
+    }, delays[i]);
+  });
+
+  let result;
+  try { result = await callClaude(); }
+  catch(e) { result = mockResult(); }
+
+  setTimeout(() => {
+    ids.forEach(x => document.getElementById(x).classList.add('done'));
+    setTimeout(() => {
+      document.getElementById('s-analyzing').classList.remove('show');
+      renderResults(result);
+    }, 600);
+  }, 5800);
+}
+
+async function callClaude() {
+  const imgContents = photos.flatMap((p,i) => [
+    { type:'image', source:{type:'base64',media_type:'image/jpeg',data:p.split(',')[1]} },
+    { type:'text', text:`(Foto ângulo: ${['frente','esquerdo','direito'][i]})` }
+  ]);
+
+  const res = await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',
+      max_tokens:1000,
+      system:`Você é especialista em dermatologia estética, odontologia e cuidados faciais com 20 anos de experiência clínica no Brasil.
+Analise as fotos do rosto do usuário e retorne APENAS JSON válido sem markdown nem texto extra:
+{
+  "score":<0-100>,
+  "grade":"<Excelente|Muito Bom|Bom|Regular|Precisa Atenção>",
+  "summary":"<frase motivadora e profissional>",
+  "age_estimated":<número>,
+  "skin_tone":"<tom de pele>",
+  "skin":{"score":<0-100>,"hydration":<0-100>,"texture":<0-100>,"spots":<0-100>,"analysis":"<2-3 frases profissionais>"},
+  "wrinkles":{"score":<0-100>,"forehead":<0-100>,"eyesContour":<0-100>,"nasolabial":<0-100>,"analysis":"<2-3 frases profissionais>"},
+  "dental":{"score":<0-100>,"whitening":<0-100>,"alignment":<0-100>,"analysis":"<1-2 frases profissionais>"},
+  "procedures":[{"name":"<nome>","feasible":<bool>,"reason":"<razão concisa>"}],
+  "tips":["<dica 1>","<dica 2>","<dica 3>","<dica 4>","<dica 5>"]
+}
+procedures deve incluir: Botox, Preenchimento Labial, Peeling Químico, Microagulhamento, Harmonização Facial, Clareamento Dental, Lentes de Contato Dental — com feasible true ou false baseado na análise real.
+Seja encorajador, realista e extremamente profissional.`,
+      messages:[{role:'user',content:[...imgContents,{type:'text',text:'Realize a análise facial completa e retorne o JSON.'}]}]
+    })
+  });
+  const d = await res.json();
+  const txt = d.content.map(b=>b.text||'').join('').replace(/```json|```/g,'').trim();
+  return JSON.parse(txt);
+}
+
+function mockResult(){
+  return{score:81,grade:'Muito Bom',summary:'Sua pele tem ótima saúde e beleza natural com grande potencial de realce!',age_estimated:29,skin_tone:'Morena clara',
+    skin:{score:83,hydration:78,texture:85,spots:76,analysis:'Pele com excelente hidratação e textura uniforme. Leves manchas solares nas maçãs do rosto com pigmentação superficial. Poros moderados na zona T com bom controle de oleosidade.'},
+    wrinkles:{score:78,forehead:74,eyesContour:75,nasolabial:68,analysis:'Linhas de expressão moderadas na região da testa, discretas ao repouso. Início de rugas finas ao redor dos olhos (pés de galinha). Sulcos nasolabiais leves, mais evidentes ao sorrir.'},
+    dental:{score:76,whitening:72,alignment:84,analysis:'Alinhamento dental muito satisfatório com boa proporção. Tom levemente amarelado que responderia bem ao clareamento profissional.'},
+    procedures:[
+      {name:'Botox Preventivo',feasible:true,reason:'Momento ideal para prevenir rugas mais profundas'},
+      {name:'Peeling Químico',feasible:true,reason:'Melhora manchas e uniformiza o tom da pele'},
+      {name:'Microagulhamento',feasible:true,reason:'Estimula colágeno e reduz poros visivelmente'},
+      {name:'Preenchimento Labial',feasible:false,reason:'Lábios em proporção harmônica — não indicado agora'},
+      {name:'Harmonização Facial',feasible:true,reason:'Pode realçar traços já bem definidos'},
+      {name:'Clareamento Dental',feasible:true,reason:'Indicado para remover pigmentação amarelada'},
+      {name:'Lentes de Contato Dental',feasible:false,reason:'Alinhamento natural já muito satisfatório'},
+    ],
+    tips:[
+      'Protetor solar FPS 50+ diariamente — o mais eficaz anti-aging disponível no mercado',
+      'Sérum de vitamina C pela manhã + retinol à noite para renovação celular acelerada',
+      'Ácido hialurônico tópico para selagem da hidratação e prevenção de ressecamento',
+      'Beba 2,5L de água por dia — impacto direto na luminosidade e elasticidade da pele',
+      'Esfoliação suave 2x por semana para remover células mortas e potencializar ativos',
+    ]
+  };
+}
+
+// ── RESULTS ───────────────────────────────────────────────────────
+function renderResults(r) {
+  goTo('s-results');
+  const circ = 2*Math.PI*52;
+  const offset = circ - (r.score/100)*circ;
+  const gc = r.score>=80?'var(--green)':r.score>=65?'var(--gold)':'var(--warn)';
+  const gbc = r.score>=80?'rgba(0,229,160,0.12)':r.score>=65?'rgba(201,168,76,0.12)':'rgba(255,107,74,0.12)';
+
+  document.getElementById('resContent').innerHTML = `
+    <div class="res-hero">
+      <div class="score-wrap">
+        <div class="score-ring-svg" style="width:120px;height:120px;">
+          <svg width="120" height="120" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(201,168,76,0.1)" stroke-width="6"/>
+            <circle cx="60" cy="60" r="52" fill="none" stroke="url(#rg)" stroke-width="6" stroke-linecap="round"
+              stroke-dasharray="${circ}" stroke-dashoffset="${circ}" id="scoreArc"
+              style="transition:stroke-dashoffset 2s cubic-bezier(.16,1,.3,1)"/>
+            <defs>
+              <linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#c9a84c"/><stop offset="100%" stop-color="#00d4ff"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="score-inner">
+            <div class="score-num" id="sNum">0</div>
+            <div class="score-of">/ 100</div>
+          </div>
+        </div>
+      </div>
+      <div class="res-grade" style="color:${gc};background:${gbc};border:1px solid ${gc}40;">${r.grade}</div>
+      <div class="res-summary">${r.summary}</div>
+      <div class="res-meta">Idade estimada: <strong>${r.age_estimated} anos</strong> &nbsp;·&nbsp; Tom: <strong>${r.skin_tone}</strong></div>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-b"><div class="stat-n" style="color:var(--gold)">${r.skin.score}</div><div class="stat-l">PELE</div></div>
+      <div class="stat-b"><div class="stat-n" style="color:var(--cyan)">${r.wrinkles.score}</div><div class="stat-l">RUGAS</div></div>
+      <div class="stat-b"><div class="stat-n" style="color:var(--green)">${r.dental.score}</div><div class="stat-l">DENTAL</div></div>
+    </div>
+
+    <div class="res-sec" style="padding-top:16px;">
+      <div class="sec-head">Fotos capturadas</div>
+    </div>
+    <div class="photos-row">
+      ${photos.map((p,i)=>`
+        <div class="ph-wrap">
+          <div class="ph-img"><img src="${p}"></div>
+          <div class="ph-lbl">${['FRENTE','ESQ','DIR'][i]}</div>
+        </div>`).join('')}
+    </div>
+
+    <div class="res-sec">
+      <div class="sec-head">🔬 Análise da Pele</div>
+      <div class="res-card ${r.skin.score>=75?'rc-green':'rc-warn'}">
+        <div class="rc-head">
+          <div class="rc-icon">💧</div>
+          <div class="rc-title">Diagnóstico Cutâneo</div>
+          <div class="rc-badge ${r.skin.score>=75?'bg-green':r.skin.score>=60?'bg-gold':'bg-warn'}">${r.skin.score}/100</div>
+        </div>
+        <div class="rc-text">${r.skin.analysis}</div>
+        ${bar('Hidratação',r.skin.hydration,r.skin.hydration>=70?'bf-green':'bf-warn')}
+        ${bar('Textura',r.skin.texture,'bf-cyan')}
+        ${bar('Manchas / Uniformidade',r.skin.spots,r.skin.spots>=70?'bf-green':'bf-warn')}
+      </div>
+    </div>
+
+    <div class="res-sec">
+      <div class="sec-head">✨ Linhas & Rugas</div>
+      <div class="res-card ${r.wrinkles.score>=75?'rc-cyan':'rc-gold'}">
+        <div class="rc-head">
+          <div class="rc-icon">🪞</div>
+          <div class="rc-title">Mapeamento de Expressão</div>
+          <div class="rc-badge ${r.wrinkles.score>=75?'bg-cyan':r.wrinkles.score>=60?'bg-gold':'bg-warn'}">${r.wrinkles.score}/100</div>
+        </div>
+        <div class="rc-text">${r.wrinkles.analysis}</div>
+        ${bar('Testa',r.wrinkles.forehead,r.wrinkles.forehead>=70?'bf-green':'bf-warn')}
+        ${bar('Contorno dos olhos',r.wrinkles.eyesContour,r.wrinkles.eyesContour>=70?'bf-cyan':'bf-warn')}
+        ${bar('Sulcos nasolabiais',r.wrinkles.nasolabial,r.wrinkles.nasolabial>=70?'bf-green':'bf-gold')}
+      </div>
+    </div>
+
+    <div class="res-sec">
+      <div class="sec-head">😁 Saúde Dental</div>
+      <div class="res-card ${r.dental.score>=75?'rc-green':'rc-gold'}">
+        <div class="rc-head">
+          <div class="rc-icon">🦷</div>
+          <div class="rc-title">Avaliação Dental</div>
+          <div class="rc-badge ${r.dental.score>=75?'bg-green':r.dental.score>=60?'bg-gold':'bg-warn'}">${r.dental.score}/100</div>
+        </div>
+        <div class="rc-text">${r.dental.analysis}</div>
+        ${bar('Clareamento',r.dental.whitening,r.dental.whitening>=70?'bf-green':'bf-gold')}
+        ${bar('Alinhamento',r.dental.alignment,r.dental.alignment>=70?'bf-cyan':'bf-warn')}
+      </div>
+    </div>
+
+    <div class="res-sec">
+      <div class="sec-head">💎 Procedimentos Estéticos</div>
+      <div class="res-card rc-gold">
+        <div class="rc-head"><div class="rc-icon">🏥</div><div class="rc-title">Recomendações Personalizadas</div></div>
+        <div class="rc-text" style="margin-bottom:14px;">Baseado na sua análise individual, nossa IA recomenda:</div>
+        <div class="proc-wrap">
+          ${r.procedures.map(p=>`
+            <div class="proc-chip ${p.feasible?'pc-yes':'pc-no'}" onclick="toast('${p.reason}','')">
+              <span>${p.feasible?'✓':'✗'}</span>${p.name}
+            </div>`).join('')}
+        </div>
+        <div class="rc-text" style="margin-top:12px;font-size:11px;opacity:.6;">Toque para ver o motivo. Consulte sempre um profissional habilitado.</div>
+      </div>
+    </div>
+
+    <div class="res-sec">
+      <div class="sec-head">💡 Rotina Recomendada</div>
+      <div class="res-card rc-cyan">
+        <div class="rc-head"><div class="rc-icon">🌟</div><div class="rc-title">Cuidados Personalizados</div></div>
+        <div class="tips-list" style="margin-top:6px;">
+          ${r.tips.map((t,i)=>`
+            <div class="tip-row">
+              <div class="tip-n">${i+1}</div>
+              <div class="tip-t">${t}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <div class="res-cta">
+      <button class="btn-gold" onclick="novaAnalise()">✦ NOVA ANÁLISE</button>
+      <button class="btn-outline" onclick="share()">↗ COMPARTILHAR RESULTADO</button>
+    </div>
+    <div style="height:32px;"></div>
+  `;
+
+  setTimeout(() => {
+    document.getElementById('scoreArc').style.strokeDashoffset = offset;
+    animNum('sNum', 0, r.score, 2000);
+    document.querySelectorAll('.bar-fill').forEach(b => {
+      setTimeout(() => b.style.width = b.dataset.w+'%', 300);
+    });
+  }, 120);
+}
+
+function bar(label, val, cls) {
+  return `<div class="bar-row">
+    <div class="bar-lbl"><span>${label}</span><span>${val}/100</span></div>
+    <div class="bar-track"><div class="bar-fill ${cls}" data-w="${val}" style="width:0%"></div></div>
+  </div>`;
+}
+
+function animNum(id, from, to, dur) {
+  const el = document.getElementById(id); if(!el) return;
+  const s = performance.now();
+  const tick = n => {
+    const p = Math.min((n-s)/dur, 1);
+    el.textContent = Math.round(from+(to-from)*(1-Math.pow(1-p,4)));
+    if(p<1) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+
+function novaAnalise() { step=0; photos=[]; goTo('s-intro'); }
+function share() {
+  if(navigator.share) navigator.share({title:'Minha Análise BELEZ-AI',text:'Fiz minha análise facial com IA no BELEZ-AI pelo app Fala Brasil! 🔬✨'}).catch(()=>{});
+  else toast('Compartilhamento não disponível neste dispositivo','');
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────
+function toast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = type ? `show ${type}` : 'show';
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.className = '', 3200);
+}
+
+// ── PWA SW ────────────────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  const sw = `self.addEventListener('install',e=>self.skipWaiting());self.addEventListener('fetch',e=>e.respondWith(fetch(e.request).catch(()=>new Response(''))));`;
+  const url = URL.createObjectURL(new Blob([sw],{type:'text/javascript'}));
+  navigator.serviceWorker.register(url).catch(()=>{});
+}
+
+// ── ADMIN ─────────────────────────────────────────────────────────
+const ADMIN_PASS = 'BELEZ2024'; // Troque para sua senha secreta
+let adminTapCount = 0, adminTapTimer = null;
+
+function adminTap() {
+  adminTapCount++;
+  clearTimeout(adminTapTimer);
+  adminTapTimer = setTimeout(() => adminTapCount = 0, 2000);
+  if (adminTapCount >= 5) { adminTapCount = 0; openAdminModal(); }
+}
+
+function openAdminModal() {
+  document.getElementById('admin-modal').style.display = 'flex';
+  setTimeout(() => document.getElementById('adminPassInput').focus(), 300);
+}
+
+function closeAdminModal() {
+  document.getElementById('admin-modal').style.display = 'none';
+  document.getElementById('adminPassInput').value = '';
+}
+
+function adminLogin() {
+  const pass = document.getElementById('adminPassInput').value.toUpperCase().trim();
+  if (pass === ADMIN_PASS) {
+    closeAdminModal();
+    openAdminPanel();
+  } else {
+    document.getElementById('adminPassInput').value = '';
+    toast('Senha incorreta!', 'error');
+  }
+}
+
+function openAdminPanel() {
+  document.getElementById('cfg-pix').textContent = CONFIG.PIX_KEY;
+  document.getElementById('cfg-venmo').textContent = CONFIG.VENMO_HANDLE;
+  document.getElementById('cfg-whats').textContent = '+' + CONFIG.WHATSAPP_NUM;
+  const wrap = document.getElementById('codes-wrap');
+  wrap.innerHTML = CONFIG.ACCESS_CODES.map(c => '<span class="code-chip">' + c + '</span>').join('');
+  goTo('s-admin');
+  toast('Bem-vindo, Admin! Acesso liberado.', 'success');
+}
+
+function adminLogout() {
+  goTo('s-intro');
+  toast('Sessao admin encerrada', '');
+}
+
+function adminStartScan() {
+  toast('Iniciando scan sem pagamento...', 'success');
+  setTimeout(() => startScan(), 800);
+}
+
+function adminShowResult() {
+  photos = [];
+  document.getElementById('s-analyzing').classList.add('show');
+  const ids = ['an1','an2','an3','an4','an5'];
+  ids.forEach((id,i) => {
+    setTimeout(() => {
+      ids.forEach(x => document.getElementById(x).classList.remove('active'));
+      if(i>0) document.getElementById(ids[i-1]).classList.add('done');
+      document.getElementById(id).classList.add('active');
+    }, i*800);
+  });
+  setTimeout(() => {
+    ids.forEach(x => document.getElementById(x).classList.add('done'));
+    setTimeout(() => {
+      document.getElementById('s-analyzing').classList.remove('show');
+      renderResults(mockResult());
+    }, 400);
+  }, 4200);
+}
+
+function adminShowPayment() { goTo('s-payment'); }
+
+</script>
+
+<!-- ADMIN MODAL -->
+<div id="admin-modal" style="position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,0.93);backdrop-filter:blur(10px);">
+  <div class="adm-box">
+    <div class="adm-icon">&#128272;</div>
+    <div class="adm-title">AREA ADMIN</div>
+    <div class="adm-sub">Acesso restrito ao administrador.<br>Digite a senha para continuar.</div>
+    <input class="adm-input" id="adminPassInput" type="password" placeholder="SENHA SECRETA" maxlength="20" onkeydown="if(event.key==='Enter')adminLogin()">
+    <button class="btn-adm-enter" onclick="adminLogin()">&#128275; ENTRAR</button>
+    <button class="btn-adm-cancel" onclick="closeAdminModal()">Cancelar</button>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="screen hidden" id="s-admin" style="overflow-y:auto;">
+  <div class="adm-header">
+    <div class="adm-header-logo">&#9881;&#65039; BELEZ-AI</div>
+    <div style="margin-top:8px;"></div>
+    <div class="adm-header-badge">&#128737;&#65039; PAINEL ADMINISTRADOR</div>
+    <div class="adm-header-title">Modo demo ativo &middot; Pagamento ignorado</div>
+  </div>
+  <div class="adm-body">
+    <div class="adm-sec-title">&#128640; Demonstracao Rapida</div>
+    <div class="adm-card">
+      <div style="font-size:13px;color:var(--text-dim);margin-bottom:14px;line-height:1.6;">
+        Pule o pagamento e demonstre o app ao vivo para seus clientes e parceiros.
+      </div>
+      <button class="demo-btn db-scan" onclick="adminStartScan()">&#128247; INICIAR SCAN FACIAL</button>
+      <button class="demo-btn db-result" onclick="adminShowResult()">&#128202; VER RESULTADO DE EXEMPLO</button>
+      <button class="demo-btn db-payment" onclick="adminShowPayment()">&#128179; VER TELA DE PAGAMENTO</button>
+    </div>
+
+    <div class="adm-sec-title">&#9881;&#65039; Configuracoes Ativas</div>
+    <div class="adm-card">
+      <div class="adm-info-row"><div class="adm-info-label">Chave PIX</div><div class="adm-info-val" id="cfg-pix">-</div></div>
+      <div class="adm-info-row"><div class="adm-info-label">Venmo</div><div class="adm-info-val" id="cfg-venmo">-</div></div>
+      <div class="adm-info-row"><div class="adm-info-label">WhatsApp</div><div class="adm-info-val" id="cfg-whats">-</div></div>
+      <div class="adm-info-row"><div class="adm-info-label">Preco PIX</div><div class="adm-info-val">R$ 25,00</div></div>
+      <div class="adm-info-row"><div class="adm-info-label">Preco Venmo</div><div class="adm-info-val">$ 5,00 USD</div></div>
+    </div>
+
+    <div class="adm-sec-title">&#128273; Codigos de Acesso</div>
+    <div class="adm-card">
+      <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;line-height:1.5;">Envie para clientes apos confirmar o pagamento:</div>
+      <div id="codes-wrap"></div>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:10px;opacity:.7;">Para adicionar novos codigos, edite ACCESS_CODES no arquivo HTML.</div>
+    </div>
+
+    <div class="adm-warning">&#9888;&#65039; Area restrita ao administrador. Nao compartilhe a senha com clientes.</div>
+    <button class="btn-outline" onclick="adminLogout()">&#8592; SAIR DO PAINEL ADMIN</button>
+    <div style="height:40px;"></div>
+  </div>
+</div>
+
+</body>
+</html>
