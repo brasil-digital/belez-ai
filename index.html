@@ -10,7 +10,6 @@
 <title>BELEZ-AI — Beleza com Inteligência Artificial</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Cormorant+Garamond:wght@300;400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <style>
 :root {
@@ -537,10 +536,6 @@ html,body{height:100%;overflow:hidden;background:var(--black);font-family:'DM Sa
         <div class="pix-card">
           <div class="pix-amount">R$ 25,00</div>
           <div class="pix-amount-label" style="margin-bottom:16px;">ANÁLISE FACIAL COMPLETA</div>
-          <div class="qr-wrap">
-            <img id="pix-qr-img" alt="QR Code PIX" style="width:100%;height:100%;border-radius:4px;">
-          </div>
-          <div style="font-size:11px;color:#888;margin-bottom:12px;">Escaneie com o app do seu banco</div>
           <div class="pix-key-box">
             <div style="flex:1;">
               <div class="pix-key-label">CHAVE PIX</div>
@@ -720,32 +715,7 @@ html,body{height:100%;overflow:hidden;background:var(--black);font-family:'DM Sa
 <div id="toast"></div>
 
 <script>
-// ── PIX QR CODE REAL ─────────────────────────────────────────────
-function buildPixPayload(pixKey, amount, merchantName, merchantCity) {
-  function f(id, val) { return id + String(val.length).padStart(2,'0') + val; }
-  const info = f('26', f('00','BR.GOV.BCB.PIX') + f('01', pixKey));
-  const extra = f('62', f('05','***'));
-  let p = f('00','01') + info + f('52','0000') + f('53','986') +
-          f('54', amount.toFixed(2)) + f('58','BR') +
-          f('59', merchantName.slice(0,25)) + f('60', merchantCity.slice(0,15)) +
-          extra + '6304';
-  let crc = 0xFFFF;
-  for (let i = 0; i < p.length; i++) {
-    crc ^= p.charCodeAt(i) << 8;
-    for (let j = 0; j < 8; j++) crc = (crc & 0x8000) ? ((crc<<1)^0x1021)&0xFFFF : (crc<<1)&0xFFFF;
-  }
-  return p + crc.toString(16).toUpperCase().padStart(4,'0');
-}
-
-function generatePixQR() {
-  const payload = buildPixPayload(CONFIG.PIX_KEY, 25.00, 'BELEZ AI', 'SAO PAULO');
-  QRCode.toDataURL(payload, { errorCorrectionLevel:'M', width:300, margin:1,
-    color:{ dark:'#000000', light:'#ffffff' } })
-    .then(url => { document.getElementById('pix-qr-img').src = url; })
-    .catch(() => {});
-}
-
-// ── CONFIG (substitua aqui antes de publicar) ─────────────────────
+// ── CONFIG ────────────────────────────────────────────────────────
 const CONFIG = {
   PIX_KEY:       '02832776612',
   VENMO_HANDLE:  '@usaronny',
@@ -764,7 +734,6 @@ const STEPS = [
 // Populate config into UI
 document.getElementById('pixKeyDisplay').textContent = CONFIG.PIX_KEY;
 document.getElementById('venmoHandle').textContent = CONFIG.VENMO_HANDLE;
-generatePixQR();
 
 // ── NAVIGATION ────────────────────────────────────────────────────
 function goTo(id) {
