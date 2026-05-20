@@ -11,6 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Cormorant+Garamond:wght@300;400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <style>
 :root {
   --black: #000000;
@@ -180,26 +181,86 @@ html,body{height:100%;overflow:hidden;background:var(--black);font-family:'DM Sa
 
 /* Overlay */
 .scan-ov{position:absolute;inset:0;pointer-events:none;z-index:15;}
-
-/* Face oval */
-.face-frame{position:absolute;top:50%;left:50%;transform:translate(-50%,-52%);width:68%;max-width:260px;aspect-ratio:.75;}
-.face-oval-svg{width:100%;height:100%;}
-
-/* Scan beam */
-.scan-beam{position:absolute;left:15%;right:15%;height:1px;background:linear-gradient(90deg,transparent,var(--gold),var(--cyan),var(--gold),transparent);box-shadow:0 0 12px var(--gold),0 0 24px var(--cyan);opacity:0;animation:beam 2.5s ease-in-out infinite;}
-@keyframes beam{0%{top:20%;opacity:0}8%{opacity:1}92%{opacity:1}100%{top:80%;opacity:0}}
-
-/* Grid */
-.scan-grid-ov{position:absolute;inset:0;opacity:0;background-image:linear-gradient(rgba(201,168,76,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,0.04) 1px,transparent 1px);background-size:28px 28px;transition:opacity .6s;}
+.scan-grid-ov{position:absolute;inset:0;opacity:0;background-image:linear-gradient(rgba(201,168,76,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,0.03) 1px,transparent 1px);background-size:28px 28px;transition:opacity .6s;}
 .scan-grid-ov.on{opacity:1;}
 
+/* ══ iOS FACE ID SPOTLIGHT ══
+   box-shadow: 0 0 0 200vmax cria a máscara escura fora do oval.
+   border-radius:50% + aspect-ratio via padding-bottom = oval perfeito.
+   mode-face: oval vertical só no rosto (não no peito).
+   mode-smile: oval horizontal focado na boca/dentes.
+*/
+.face-spotlight{position:absolute;left:50%;transform:translate(-50%,-50%);border-radius:50%;box-shadow:0 0 0 200vmax rgba(0,0,0,0.80);overflow:visible;transition:width .4s,top .4s;}
+.face-spotlight.mode-face{top:31%;width:52%;}
+.face-spotlight.mode-face::after{content:'';display:block;padding-bottom:138%;}
+.face-spotlight.mode-smile{top:53%;width:74%;}
+.face-spotlight.mode-smile::after{content:'';display:block;padding-bottom:37%;}
+
+/* Borda dourada + pulse */
+.oval-border{position:absolute;inset:0;border-radius:50%;border:1.5px solid rgba(201,168,76,0.85);box-shadow:0 0 16px rgba(201,168,76,0.25) inset;}
+.oval-pulse{position:absolute;inset:-6px;border-radius:50%;border:1px solid rgba(0,212,255,0.4);animation:oPulse 2.2s ease-out infinite;}
+@keyframes oPulse{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.06);opacity:0}}
+
+/* Brackets iOS nos cantos do bounding-box do oval */
+.face-brackets{position:absolute;left:50%;transform:translate(-50%,-50%);pointer-events:none;transition:width .4s,top .4s;}
+.face-brackets.mode-face{top:31%;width:57%;}
+.face-brackets.mode-face::after{content:'';display:block;padding-bottom:138%;}
+.face-brackets.mode-smile{top:53%;width:80%;}
+.face-brackets.mode-smile::after{content:'';display:block;padding-bottom:37%;}
+.face-brackets-inner{position:absolute;inset:0;}
+.br-c{position:absolute;width:22px;height:22px;}
+.br-tl{top:0;left:0;border-top:2.5px solid var(--cyan);border-left:2.5px solid var(--cyan);border-radius:4px 0 0 0;}
+.br-tr{top:0;right:0;border-top:2.5px solid var(--cyan);border-right:2.5px solid var(--cyan);border-radius:0 4px 0 0;}
+.br-bl{bottom:0;left:0;border-bottom:2.5px solid var(--cyan);border-left:2.5px solid var(--cyan);border-radius:0 0 0 4px;}
+.br-br{bottom:0;right:0;border-bottom:2.5px solid var(--cyan);border-right:2.5px solid var(--cyan);border-radius:0 0 4px 0;}
+
+/* Pontos de mapeamento 3D */
+.face-dots-wrap{position:absolute;inset:0;pointer-events:none;}
+.fdot{position:absolute;width:4px;height:4px;margin:-2px 0 0 -2px;border-radius:50%;background:var(--cyan);opacity:0;transform:scale(0);transition:opacity .28s,transform .28s;box-shadow:0 0 5px var(--cyan);}
+.fdot.lit{opacity:.85;transform:scale(1);}
+.fdot.dim{opacity:.2;transform:scale(.4);}
+.sdot{position:absolute;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-radius:50%;background:var(--gold);opacity:0;transform:scale(0);transition:opacity .25s,transform .25s;box-shadow:0 0 5px var(--gold);}
+.sdot.lit{opacity:.9;transform:scale(1);}
+
+/* Scan beam dentro do oval */
+.scan-beam{position:absolute;left:8%;right:8%;height:1px;background:linear-gradient(90deg,transparent,var(--gold),var(--cyan),var(--gold),transparent);box-shadow:0 0 10px var(--gold),0 0 20px var(--cyan);opacity:0;animation:beam 2.5s ease-in-out infinite;}
+@keyframes beam{0%{top:8%;opacity:0}8%{opacity:1}92%{opacity:1}100%{top:92%;opacity:0}}
+
 /* Direction hint */
-.dir-hint{position:absolute;bottom:24%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.8);border:1px solid var(--border);border-radius:30px;padding:10px 22px;display:flex;align-items:center;gap:10px;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600;letter-spacing:1px;white-space:nowrap;}
+.dir-hint{position:absolute;bottom:23%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.88);border:1px solid var(--border);border-radius:30px;padding:10px 22px;display:flex;align-items:center;gap:10px;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600;letter-spacing:1px;white-space:nowrap;z-index:25;}
 .dir-hint-icon{font-size:20px;}
 
 /* Flash */
 .flash{position:absolute;inset:0;background:white;opacity:0;pointer-events:none;z-index:30;transition:opacity .08s;}
-.flash.go{opacity:.65;}
+.flash.go{opacity:.6;}
+
+/* ══ TELA SELEÇÃO DE SCAN ══ */
+#s-scan-select{padding:0;justify-content:flex-start;overflow:hidden;}
+.sts-wrap{width:100%;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.sts-wrap::-webkit-scrollbar{display:none;}
+.sts-header{width:100%;padding:52px 24px 20px;text-align:center;background:linear-gradient(180deg,rgba(201,168,76,0.08),transparent);border-bottom:1px solid var(--border);}
+.sts-brand{font-family:'Rajdhani',sans-serif;font-size:13px;letter-spacing:3px;color:var(--gold);margin-bottom:6px;}
+.sts-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400;margin-bottom:4px;}
+.sts-sub{font-size:13px;color:var(--text-dim);}
+.sts-body{padding:20px 20px 40px;display:flex;flex-direction:column;gap:14px;}
+.sts-card{background:var(--surface);border:1.5px solid var(--border);border-radius:20px;padding:26px 20px;cursor:pointer;transition:border-color .25s,transform .15s;display:flex;flex-direction:column;align-items:center;gap:10px;position:relative;overflow:hidden;}
+.sts-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.sts-face::before{background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.sts-smile::before{background:linear-gradient(90deg,transparent,var(--cyan),transparent);}
+.sts-card:active{transform:scale(.97);}
+.sts-icon{font-size:52px;line-height:1;}
+.sts-name{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;letter-spacing:1px;}
+.sts-name-f{color:var(--gold);}
+.sts-name-s{color:var(--cyan);}
+.sts-desc{font-size:13px;color:var(--text-dim);text-align:center;line-height:1.65;max-width:280px;}
+.sts-tags{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+.sts-tag{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;padding:4px 12px;border-radius:10px;}
+.sts-tg{border:1px solid var(--gold-dim);color:var(--gold);background:rgba(201,168,76,0.07);}
+.sts-tc{border:1px solid var(--border-cyan);color:var(--cyan);background:rgba(0,212,255,0.07);}
+
+/* ══ PDF BUTTON ══ */
+.btn-pdf{width:100%;height:56px;border-radius:14px;border:1.5px solid var(--gold-dim);background:rgba(201,168,76,0.06);color:var(--gold);font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;letter-spacing:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:border-color .2s,opacity .2s;}
+.btn-pdf:active{opacity:.8;border-color:var(--gold);}
 
 /* Thumbs */
 .thumb-col{position:absolute;bottom:28%;left:16px;z-index:20;display:flex;flex-direction:column;gap:6px;}
@@ -535,14 +596,48 @@ html,body{height:100%;overflow:hidden;background:var(--black);font-family:'DM Sa
   </div>
 </div>
 
+<!-- ══════════ SELEÇÃO DE SCAN ══════════ -->
+<div class="screen hidden" id="s-scan-select">
+  <div class="sts-wrap">
+    <div class="sts-header">
+      <div class="sts-brand">BELEZ-AI</div>
+      <div class="sts-title">Escolha a análise</div>
+      <div class="sts-sub">Selecione o que deseja escanear hoje</div>
+    </div>
+    <div class="sts-body">
+      <div class="sts-card sts-face" onclick="startScan('face')">
+        <div class="sts-icon">🫦</div>
+        <div class="sts-name sts-name-f">ANÁLISE FACIAL</div>
+        <div class="sts-desc">Scanner estilo Face ID — mapeia pele, rugas, estrutura e assimetrias com 3 ângulos de captura.</div>
+        <div class="sts-tags">
+          <span class="sts-tag sts-tg">3 capturas</span>
+          <span class="sts-tag sts-tg">Pele & Rugas</span>
+          <span class="sts-tag sts-tg">Procedimentos</span>
+        </div>
+      </div>
+      <div class="sts-card sts-smile" onclick="startScan('smile')">
+        <div class="sts-icon">😁</div>
+        <div class="sts-name sts-name-s">ANÁLISE DO SORRISO</div>
+        <div class="sts-desc">Scanner dental especializado — avalia alinhamento, clareamento, gengiva e saúde dos dentes.</div>
+        <div class="sts-tags">
+          <span class="sts-tag sts-tc">2 capturas</span>
+          <span class="sts-tag sts-tc">Clareamento</span>
+          <span class="sts-tag sts-tc">Alinhamento</span>
+        </div>
+      </div>
+      <button class="btn-outline" style="width:100%;margin-top:4px;" onclick="goTo('s-payment')">← VOLTAR</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══════════ SCAN ══════════ -->
 <div class="screen hidden" id="s-scan" style="overflow:hidden;">
   <div class="scan-header">
     <div class="scan-brand">BELEZ-AI</div>
     <div class="scan-step" id="sc-step">PASSO 1 DE 3</div>
     <div class="scan-title" id="sc-title">Olhe diretamente para a câmera</div>
-    <div class="scan-sub" id="sc-sub">Centralize seu rosto no guia oval</div>
-    <div class="scan-prog">
+    <div class="scan-sub" id="sc-sub">Centralize APENAS o rosto no oval</div>
+    <div class="scan-prog" id="scanProg">
       <div class="sp-dot w1 active" id="sd0"></div>
       <div class="sp-dot w2" id="sd1"></div>
       <div class="sp-dot w2" id="sd2"></div>
@@ -555,32 +650,38 @@ html,body{height:100%;overflow:hidden;background:var(--black);font-family:'DM Sa
 
     <div class="scan-ov">
       <div class="scan-grid-ov" id="scanGrid"></div>
-      <div class="face-frame">
-        <svg class="face-oval-svg" viewBox="0 0 200 267" fill="none">
-          <ellipse cx="100" cy="133" rx="96" ry="129" stroke="#c9a84c" stroke-width="1.5" opacity=".7"/>
-          <!-- corners -->
-          <path d="M30 20 L10 20 L10 40" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M170 20 L190 20 L190 40" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M30 247 L10 247 L10 227" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M170 247 L190 247 L190 227" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+
+      <!-- Spotlight oval com máscara escura (iOS Face ID) -->
+      <div class="face-spotlight mode-face" id="faceSpotlight">
+        <div class="oval-border"></div>
+        <div class="oval-pulse"></div>
+        <div class="face-dots-wrap" id="faceDots"></div>
+        <div class="scan-beam" id="scanBeam"></div>
       </div>
-      <div class="scan-beam" id="scanBeam"></div>
+
+      <!-- Brackets iOS nos cantos -->
+      <div class="face-brackets mode-face" id="faceBrackets">
+        <div class="face-brackets-inner">
+          <div class="br-c br-tl"></div>
+          <div class="br-c br-tr"></div>
+          <div class="br-c br-bl"></div>
+          <div class="br-c br-br"></div>
+        </div>
+      </div>
+
       <div class="dir-hint" id="dirHint"><span class="dir-hint-icon" id="dirIcon">⬆️</span><span id="dirTxt">FRENTE</span></div>
       <div class="flash" id="flash"></div>
     </div>
 
-    <div class="thumb-col">
+    <div class="thumb-col" id="thumbCol">
       <div class="thumb-item" id="th0"><div class="t-check">✓</div></div>
       <div class="thumb-item" id="th1"><div class="t-check">✓</div></div>
       <div class="thumb-item" id="th2"><div class="t-check">✓</div></div>
     </div>
 
     <div class="capture-zone">
-      <button class="cap-btn" onclick="capture()">
-        <div class="cap-inner"></div>
-      </button>
-      <div class="cap-label">FOTOGRAFAR</div>
+      <button class="cap-btn" onclick="capture()"><div class="cap-inner"></div></button>
+      <div class="cap-label" id="capLabel">FOTOGRAFAR</div>
     </div>
   </div>
 </div>
@@ -718,17 +819,70 @@ function validateCodeVenmo() { checkCode(document.getElementById('codeInputVenmo
 function checkCode(code) {
   if (!code) { toast('Digite o código de acesso','error'); return; }
   if (CONFIG.ACCESS_CODES.includes(code.toUpperCase())) {
-    toast('Código válido! Iniciando scan...','success');
-    setTimeout(() => startScan(), 1200);
+    toast('Código válido! Escolha a análise…','success');
+    setTimeout(() => goTo('s-scan-select'), 1000);
   } else {
     toast('Código inválido. Verifique e tente novamente.','error');
   }
 }
 
+// ── SCAN MODE STATE ───────────────────────────────────────────────
+let scanMode = 'face', dotsTimer = null;
+
+const SMILE_STEPS = [
+  { step:'PASSO 1 DE 2', title:'Sorria abertamente para a câmera', sub:'Mostre todos os dentes', icon:'😁', dir:'SORRISO' },
+  { step:'PASSO 2 DE 2', title:'Abra bem a boca — mostre os dentes', sub:'Queremos ver o alinhamento completo', icon:'🦷', dir:'DENTES' },
+];
+
+// Landmarks faciais [x%, y%] dentro do bounding-box do oval
+const FACE_LM = [
+  [50,7],[30,14],[70,14],[15,22],[85,22],
+  [26,33],[33,30],[40,33],[26,38],[33,39],[40,38],
+  [60,33],[67,30],[74,33],[60,38],[67,39],[74,38],
+  [50,44],[44,52],[56,52],[50,56],
+  [33,67],[50,63],[67,67],[42,72],[58,72],[50,75],
+  [18,55],[82,55],[22,70],[78,70],[50,90]
+];
+const SMILE_LM = [
+  [12,45],[24,34],[38,28],[50,26],[62,28],[76,34],[88,45],
+  [18,56],[36,68],[50,73],[64,68],[82,56],
+  [28,78],[50,83],[72,78]
+];
+
+function startFaceDots() {
+  clearTimeout(dotsTimer);
+  const wrap = document.getElementById('faceDots');
+  wrap.innerHTML = '';
+  const lms = scanMode === 'smile' ? SMILE_LM : FACE_LM;
+  const cls = scanMode === 'smile' ? 'sdot' : 'fdot';
+  const dots = lms.map(([x,y]) => {
+    const d = document.createElement('div');
+    d.className = cls; d.style.left = x+'%'; d.style.top = y+'%';
+    wrap.appendChild(d); return d;
+  });
+  let i = 0;
+  function tick() {
+    if (i < dots.length) {
+      dots[i].classList.add('lit');
+      if (i >= 6) dots[i-6].classList.add('dim');
+      i++; dotsTimer = setTimeout(tick, 70);
+    } else {
+      dotsTimer = setTimeout(() => { dots.forEach(d => d.classList.remove('lit','dim')); i=0; dotsTimer = setTimeout(tick,700); }, 2000);
+    }
+  }
+  dotsTimer = setTimeout(tick, 500);
+}
+
 // ── SCAN ──────────────────────────────────────────────────────────
-async function startScan() {
+async function startScan(mode) {
+  scanMode = mode || 'face';
   goTo('s-scan');
   step = 0; photos = [];
+
+  // Alterna modo do overlay
+  document.getElementById('faceSpotlight').className = `face-spotlight mode-${scanMode}`;
+  document.getElementById('faceBrackets').className = `face-brackets mode-${scanMode}`;
+
   resetScanUI();
   try {
     camStream = await navigator.mediaDevices.getUserMedia({
@@ -737,28 +891,39 @@ async function startScan() {
     document.getElementById('video').srcObject = camStream;
   } catch(e) {
     toast('Câmera não disponível. Verifique as permissões.','error');
+    return;
   }
   setTimeout(() => {
     document.getElementById('scanGrid').classList.add('on');
-  }, 600);
+    startFaceDots();
+  }, 700);
 }
 
+function getSteps() { return scanMode === 'smile' ? SMILE_STEPS : STEPS; }
+
 function resetScanUI() {
-  ['sd0','sd1','sd2'].forEach((id,i) => {
-    const el = document.getElementById(id);
-    el.classList.remove('active','done');
-    el.className = 'sp-dot ' + (i===0?'w1':'w2');
+  const steps = getSteps();
+  // Progress dots
+  const prog = document.getElementById('scanProg');
+  prog.innerHTML = '';
+  steps.forEach((_,i) => {
+    const d = document.createElement('div');
+    d.className = 'sp-dot '+(i===0?'w1 active':'w2'); d.id='sd'+i;
+    prog.appendChild(d);
   });
-  document.getElementById('sd0').classList.add('active');
-  ['th0','th1','th2'].forEach(id => {
-    document.getElementById(id).className = 'thumb-item';
-    document.getElementById(id).innerHTML = '<div class="t-check">✓</div>';
+  // Thumbnails
+  const tc = document.getElementById('thumbCol');
+  tc.innerHTML = '';
+  steps.forEach((_,i) => {
+    const el = document.createElement('div');
+    el.className='thumb-item'; el.id='th'+i;
+    el.innerHTML='<div class="t-check">✓</div>'; tc.appendChild(el);
   });
   updateScanUI(0);
 }
 
 function updateScanUI(s) {
-  const d = STEPS[s];
+  const d = getSteps()[s];
   document.getElementById('sc-step').textContent = d.step;
   document.getElementById('sc-title').textContent = d.title;
   document.getElementById('sc-sub').textContent = d.sub;
@@ -790,16 +955,18 @@ function capture() {
   document.getElementById(`sd${step}`).classList.add('done');
   step++;
 
-  if (step < STEPS.length) {
+  if (step < getSteps().length) {
     document.getElementById(`sd${step}`).classList.add('active');
     updateScanUI(step);
   } else {
+    clearTimeout(dotsTimer);
     startAnalysis();
   }
 }
 
 // ── ANALYSIS ──────────────────────────────────────────────────────
 async function startAnalysis() {
+  clearTimeout(dotsTimer);
   if (camStream) camStream.getTracks().forEach(t=>t.stop());
   document.getElementById('s-analyzing').classList.add('show');
 
@@ -841,7 +1008,7 @@ function mockResult(){
   return{score:81,grade:'Muito Bom',summary:'Sua pele tem ótima saúde e beleza natural com grande potencial de realce!',age_estimated:29,skin_tone:'Morena clara',
     skin:{score:83,hydration:78,texture:85,spots:76,analysis:'Pele com excelente hidratação e textura uniforme. Leves manchas solares nas maçãs do rosto com pigmentação superficial. Poros moderados na zona T com bom controle de oleosidade.'},
     wrinkles:{score:78,forehead:74,eyesContour:75,nasolabial:68,analysis:'Linhas de expressão moderadas na região da testa, discretas ao repouso. Início de rugas finas ao redor dos olhos (pés de galinha). Sulcos nasolabiais leves, mais evidentes ao sorrir.'},
-    dental:{score:76,whitening:72,alignment:84,analysis:'Alinhamento dental muito satisfatório com boa proporção. Tom levemente amarelado que responderia bem ao clareamento profissional.'},
+    dental:{score:76,whitening:72,alignment:84,gum:80,analysis:'Alinhamento dental muito satisfatório com boa proporção. Tom levemente amarelado que responderia bem ao clareamento profissional. Gengiva saudável e bem definida.'},
     procedures:[
       {name:'Botox Preventivo',feasible:true,reason:'Momento ideal para prevenir rugas mais profundas'},
       {name:'Peeling Químico',feasible:true,reason:'Melhora manchas e uniformiza o tom da pele'},
@@ -862,7 +1029,9 @@ function mockResult(){
 }
 
 // ── RESULTS ───────────────────────────────────────────────────────
+let currentResult = null;
 function renderResults(r) {
+  currentResult = r;
   goTo('s-results');
   const circ = 2*Math.PI*52;
   const offset = circ - (r.score/100)*circ;
@@ -986,6 +1155,7 @@ function renderResults(r) {
     </div>
 
     <div class="res-cta">
+      <button class="btn-pdf" onclick="downloadPDF()">📄 BAIXAR RELATÓRIO PDF</button>
       <button class="btn-gold" onclick="novaAnalise()">✦ NOVA ANÁLISE</button>
       <button class="btn-outline" onclick="share()">↗ COMPARTILHAR RESULTADO</button>
     </div>
@@ -1089,8 +1259,146 @@ function adminLogout() {
 }
 
 function adminStartScan() {
-  toast('Iniciando scan sem pagamento...', 'success');
-  setTimeout(() => startScan(), 800);
+  toast('Escolha o tipo de análise…', 'success');
+  setTimeout(() => goTo('s-scan-select'), 600);
+}
+
+// ── PDF ───────────────────────────────────────────────────────────
+async function loadLogoB64() {
+  return new Promise(res => {
+    const img = new Image(); img.crossOrigin='anonymous';
+    img.onload = () => { try { const c=document.createElement('canvas'); c.width=img.naturalWidth; c.height=img.naturalHeight; c.getContext('2d').drawImage(img,0,0); res(c.toDataURL('image/png')); } catch(e){res(null);} };
+    img.onerror = () => res(null);
+    img.src = 'logo.png?'+Date.now();
+  });
+}
+
+async function downloadPDF() {
+  if (!currentResult) { toast('Sem resultado para gerar PDF','error'); return; }
+  if (!window.jspdf) { toast('PDF não disponível — verifique conexão','error'); return; }
+  toast('Gerando PDF…','');
+  const {jsPDF} = window.jspdf;
+  const r = currentResult;
+  const doc = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const W=210,H=297,M=14,cW=W-2*M; let y=0;
+
+  // Header
+  doc.setFillColor(5,5,8); doc.rect(0,0,W,50,'F');
+  doc.setFillColor(201,168,76); doc.rect(0,50,W,0.6,'F');
+  const logo = await loadLogoB64();
+  if(logo){try{doc.addImage(logo,'PNG',M,7,34,34);}catch(e){}}
+  doc.setFont('helvetica','bold'); doc.setFontSize(26); doc.setTextColor(201,168,76);
+  doc.text('BELEZ-AI',M+40,22);
+  doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(140,140,160);
+  doc.text('BELEZA COM INTELIGÊNCIA ARTIFICIAL',M+40,29);
+  doc.setFontSize(9); doc.setTextColor(220,225,240);
+  doc.text('RELATÓRIO DE ANÁLISE ESTÉTICA COMPLETA',M+40,38);
+  const ds=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+  doc.setFontSize(7.5); doc.setTextColor(140,140,160); doc.text(ds,W-M,44,{align:'right'});
+  y=60;
+
+  // Score
+  const sc=r.score>=80?[0,229,160]:r.score>=65?[201,168,76]:[255,107,74];
+  const cx=M+24,cy=y+22;
+  doc.setDrawColor(30,30,45); doc.setLineWidth(3.5); doc.circle(cx,cy,18,'S');
+  doc.setFont('helvetica','bold'); doc.setFontSize(26); doc.setTextColor(...sc);
+  doc.text(String(r.score),cx,cy+5,{align:'center'});
+  doc.setFontSize(7); doc.setTextColor(120,128,144); doc.text('/100',cx,cy+11,{align:'center'});
+  doc.setFillColor(...sc.map(c=>Math.round(c*.12))); doc.roundedRect(cx-14,cy+14,28,9,4,4,'F');
+  doc.setTextColor(...sc); doc.setFontSize(7); doc.setFont('helvetica','bold');
+  doc.text(r.grade.toUpperCase(),cx,cy+20,{align:'center'});
+  doc.setFont('helvetica','normal'); doc.setFontSize(11); doc.setTextColor(210,215,235);
+  const sl=doc.splitTextToSize(r.summary,cW-54); doc.text(sl,M+52,y+10);
+  doc.setFontSize(8); doc.setTextColor(120,128,144);
+  doc.text('Idade estimada: '+r.age_estimated+' anos  ·  Tom: '+r.skin_tone,M+52,y+10+sl.length*6+4);
+  y+=58;
+
+  // Stats
+  doc.setDrawColor(60,50,20); doc.setLineWidth(0.4); doc.line(M,y,W-M,y); y+=8;
+  [{label:'PELE',value:r.skin.score,color:[201,168,76]},{label:'RUGAS',value:r.wrinkles.score,color:[0,212,255]},{label:'DENTAL',value:r.dental.score,color:[0,229,160]}].forEach((s,i)=>{
+    const sx=M+i*(cW/3)+cW/6;
+    doc.setFont('helvetica','bold'); doc.setFontSize(22); doc.setTextColor(...s.color); doc.text(String(s.value),sx,y+10,{align:'center'});
+    doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(120,128,144); doc.text(s.label,sx,y+16,{align:'center'});
+    doc.setFillColor(25,25,38); doc.rect(sx-14,y+19,28,2.5,'F');
+    doc.setFillColor(...s.color); doc.rect(sx-14,y+19,28*s.value/100,2.5,'F');
+  });
+  y+=30; doc.setDrawColor(60,50,20); doc.setLineWidth(0.4); doc.line(M,y,W-M,y); y+=10;
+
+  // Sections
+  y=pdfSec(doc,'ANÁLISE DA PELE',r.skin.analysis,[{label:'Hidratação',value:r.skin.hydration},{label:'Textura',value:r.skin.texture},{label:'Manchas',value:r.skin.spots}],y,W,M,cW,r.skin.score); y+=7;
+  if(y>210){doc.addPage();pdfFoot(doc,W,H,M);y=20;}
+  y=pdfSec(doc,'LINHAS & RUGAS',r.wrinkles.analysis,[{label:'Testa',value:r.wrinkles.forehead},{label:'Olhos',value:r.wrinkles.eyesContour},{label:'Sulcos',value:r.wrinkles.nasolabial}],y,W,M,cW,r.wrinkles.score); y+=7;
+  if(y>200){doc.addPage();pdfFoot(doc,W,H,M);y=20;}
+  y=pdfSec(doc,'SAÚDE & ESTÉTICA DENTAL',r.dental.analysis,[{label:'Clareamento',value:r.dental.whitening},{label:'Alinhamento',value:r.dental.alignment},{label:'Gengiva',value:r.dental.gum||80}],y,W,M,cW,r.dental.score); y+=10;
+
+  if(y>200){doc.addPage();pdfFoot(doc,W,H,M);y=20;}
+  // Procedimentos
+  doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(201,168,76);
+  doc.text('PROCEDIMENTOS ESTÉTICOS',M,y); y+=8;
+  r.procedures.forEach(p=>{
+    if(y>270){doc.addPage();pdfFoot(doc,W,H,M);y=20;}
+    const col=p.feasible?[0,229,160]:[255,107,74];
+    doc.setFillColor(...col.map(c=>Math.round(c*.08))); doc.setDrawColor(...col.map(c=>Math.round(c*.4))); doc.setLineWidth(0.3);
+    doc.roundedRect(M,y,cW,10,2,2,'FD');
+    doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(...col);
+    doc.text(p.feasible?'✓':'✗',M+4,y+7);
+    doc.setTextColor(205,210,230); doc.text(p.name,M+12,y+7);
+    doc.setFont('helvetica','normal'); doc.setTextColor(120,128,144); doc.setFontSize(7.5);
+    doc.text(p.reason,W-M-2,y+7,{align:'right'}); y+=13;
+  }); y+=6;
+
+  if(y>220){doc.addPage();pdfFoot(doc,W,H,M);y=20;}
+  doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(0,212,255);
+  doc.text('ROTINA PERSONALIZADA',M,y); y+=8;
+  r.tips.forEach((tip,i)=>{
+    if(y>265){doc.addPage();pdfFoot(doc,W,H,M);y=20;}
+    doc.setFillColor(0,40,60); doc.circle(M+5,y+3.5,4,'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(0,212,255); doc.text(String(i+1),M+5,y+5.5,{align:'center'});
+    const tl=doc.splitTextToSize(tip,cW-14);
+    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(175,180,200); doc.text(tl,M+13,y+4);
+    y+=tl.length*5.2+7;
+  }); y+=8;
+
+  if(y>265){doc.addPage();pdfFoot(doc,W,H,M);y=20;}
+  doc.setFillColor(12,12,20); doc.rect(M,y,cW,16,'F');
+  doc.setFont('helvetica','italic'); doc.setFontSize(7); doc.setTextColor(100,108,120);
+  const disc='As análises apresentadas têm caráter informativo e educativo, geradas por inteligência artificial. Consulte sempre um profissional habilitado para orientações estéticas e médicas personalizadas.';
+  doc.text(doc.splitTextToSize(disc,cW-8),M+4,y+5);
+
+  pdfFoot(doc,W,H,M);
+  doc.save('BELEZ-AI-Relatorio.pdf');
+  toast('PDF baixado com sucesso! 📄','success');
+}
+
+function pdfSec(doc,title,analysis,bars,y,W,M,cW,score){
+  const sc=score>=75?[0,229,160]:score>=60?[201,168,76]:[255,107,74];
+  doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(201,168,76); doc.text(title,M,y); y+=5;
+  const al=doc.splitTextToSize(analysis,cW-26);
+  const ch=al.length*5.2+bars.length*11+20;
+  doc.setFillColor(10,10,16); doc.setDrawColor(50,42,15); doc.setLineWidth(0.3);
+  doc.roundedRect(M,y,cW,ch,3,3,'FD');
+  doc.setFillColor(...sc); doc.rect(M,y,2.5,ch,'F');
+  doc.setFillColor(...sc.map(c=>Math.round(c*.12))); doc.roundedRect(W-M-22,y+5,20,9,3,3,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(...sc);
+  doc.text(score+'/100',W-M-12,y+10.8,{align:'center'});
+  y+=7; doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(160,165,185); doc.text(al,M+5,y); y+=al.length*5.2+5;
+  bars.forEach(b=>{
+    const bc=b.value>=70?[0,229,160]:b.value>=55?[201,168,76]:[255,107,74];
+    doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(120,128,144);
+    doc.text(b.label,M+5,y); doc.text(b.value+'/100',W-M-5,y,{align:'right'}); y+=3.5;
+    doc.setFillColor(22,22,32); doc.rect(M+5,y,cW-28,2.5,'F');
+    doc.setFillColor(...bc); doc.rect(M+5,y,(cW-28)*b.value/100,2.5,'F'); y+=8;
+  });
+  return y+4;
+}
+
+function pdfFoot(doc,W,H,M){
+  doc.setFillColor(5,5,8); doc.rect(0,H-14,W,14,'F');
+  doc.setFillColor(201,168,76); doc.rect(0,H-14,W,0.4,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(201,168,76); doc.text('BELEZ-AI',M,H-6);
+  doc.setFont('helvetica','normal'); doc.setTextColor(100,108,120);
+  doc.text('Beleza com Inteligência Artificial · Relatório gerado por IA',W/2,H-6,{align:'center'});
+  doc.text('Documento informativo — consulte um profissional',W-M,H-6,{align:'right'});
 }
 
 function adminShowResult() {
