@@ -409,6 +409,9 @@ html,body{height:100%;overflow:hidden;background:var(--black);font-family:'DM Sa
 
 <!-- ══════════ HERO ══════════ -->
 <div class="screen" id="s-intro">
+  <!-- Área secreta de admin: canto superior esquerdo, invisível -->
+  <div id="secret-admin-zone" onclick="secretAdminTap()" style="position:absolute;top:0;left:0;width:54px;height:54px;z-index:50;cursor:default;-webkit-tap-highlight-color:transparent;"></div>
+
   <div class="hero-top">
     <div class="hero-logo" onclick="adminTap()">
       <img src="logo.png" alt="BELEZ-AI">
@@ -1456,7 +1459,7 @@ if ('serviceWorker' in navigator) {
 }
 
 // ── ADMIN ─────────────────────────────────────────────────────────
-const ADMIN_PASS = 'BELEZ2024'; // Troque para sua senha secreta
+const ADMIN_PASS = 'BELEZ2024';
 let adminTapCount = 0, adminTapTimer = null;
 
 function adminTap() {
@@ -1464,6 +1467,18 @@ function adminTap() {
   clearTimeout(adminTapTimer);
   adminTapTimer = setTimeout(() => adminTapCount = 0, 2000);
   if (adminTapCount >= 5) { adminTapCount = 0; openAdminModal(); }
+}
+
+// Acesso secreto: 3 taps rápidos no canto superior esquerdo → admin direto (sem senha)
+let secretTapCount = 0, secretTapTimer = null;
+function secretAdminTap() {
+  secretTapCount++;
+  clearTimeout(secretTapTimer);
+  secretTapTimer = setTimeout(() => { secretTapCount = 0; }, 1200);
+  if (secretTapCount >= 3) {
+    secretTapCount = 0;
+    openAdminPanel();
+  }
 }
 
 function openAdminModal() {
