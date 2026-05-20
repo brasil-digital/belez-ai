@@ -689,142 +689,16 @@ html,body{height:100%;overflow:hidden;background:var(--black);font-family:'DM Sa
 <div id="toast"></div>
 
 <script>
-// ── BEAUTY AUDIO — moderno, cristalino, estilo Dior/Chanel ────────
+// ── INTRO AUDIO ───────────────────────────────────────────────────
 let _audioPlayed = false;
+const _introAudio = new Audio('logo-sound.mp3');
+_introAudio.volume = 0.85;
 
 function onEntrar() {
   goTo('s-details');
   if (_audioPlayed) return;
   _audioPlayed = true;
-  try {
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) return;
-    const ctx = new AC();
-    const t = ctx.currentTime;
-
-    // Master: fade-in rápido, fade-out suave no final
-    const master = ctx.createGain();
-    master.gain.setValueAtTime(0, t);
-    master.gain.linearRampToValueAtTime(0.55, t + 0.8);
-    master.gain.setValueAtTime(0.55, t + 26);
-    master.gain.linearRampToValueAtTime(0, t + 30);
-    master.connect(ctx.destination);
-
-    // Reverb curto e arejado (não cavernoso)
-    const rb = ctx.createBuffer(2, ctx.sampleRate * 1.4, ctx.sampleRate);
-    for (let c = 0; c < 2; c++) {
-      const d = rb.getChannelData(c);
-      for (let i = 0; i < d.length; i++) d[i] = (Math.random()*2-1) * Math.pow(1-i/d.length, 5);
-    }
-    const rev = ctx.createConvolver(); rev.buffer = rb;
-    const rg = ctx.createGain(); rg.gain.value = 0.18;
-    rev.connect(rg); rg.connect(master);
-
-    // Dry
-    const dry = ctx.createGain(); dry.gain.value = 1; dry.connect(master);
-
-    // Pad aéreo — só frequências médias/altas, nada pesado embaixo
-    function pad(hz, amp, t0, dur) {
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      const hp = ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=300;
-      const lp = ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=1800;
-      o.type='sine'; o.frequency.value=hz;
-      g.gain.setValueAtTime(0,t0);
-      g.gain.linearRampToValueAtTime(amp,t0+1.2);
-      g.gain.setValueAtTime(amp,t0+dur-1.8);
-      g.gain.linearRampToValueAtTime(0,t0+dur);
-      o.connect(hp); hp.connect(lp); lp.connect(g);
-      g.connect(dry); g.connect(rev);
-      o.start(t0); o.stop(t0+dur+0.1);
-    }
-
-    // Crystal ping — frequências inarmônicas = som de cristal/taça de champagne
-    function ping(hz, amp, t0) {
-      [[1,amp],[2.756,amp*0.38],[5.404,amp*0.18],[8.933,amp*0.09]].forEach(([r,a])=>{
-        const o=ctx.createOscillator(), g=ctx.createGain();
-        o.type='sine'; o.frequency.value=hz*r;
-        const dec=1.4/Math.sqrt(r);
-        g.gain.setValueAtTime(0,t0);
-        g.gain.linearRampToValueAtTime(a,t0+0.006); // ataque instantâneo
-        g.gain.exponentialRampToValueAtTime(0.0001,t0+dec);
-        o.connect(g); g.connect(dry); g.connect(rev);
-        o.start(t0); o.stop(t0+dec+0.05);
-      });
-    }
-
-    // Sparkle — brilho alto bem curto (estilo diamante cintilando)
-    function spark(hz, amp, t0) {
-      const o=ctx.createOscillator(), g=ctx.createGain();
-      o.type='sine'; o.frequency.value=hz;
-      g.gain.setValueAtTime(amp,t0);
-      g.gain.exponentialRampToValueAtTime(0.0001,t0+0.45);
-      o.connect(g); g.connect(dry); g.connect(rev);
-      o.start(t0); o.stop(t0+0.5);
-    }
-
-    // ── PADS — A major, região média-alta ─────────────────────────
-    pad(440, 0.055, t,    30);  // A4
-    pad(554.37,0.04,t,    30);  // C#5
-    pad(659.25,0.03,t+1,  28);  // E5
-    pad(739.99,0.025,t+8, 14);  // F#5 (seção central)
-    pad(880, 0.02, t+18,  10);  // A5 (final)
-
-    // ── ABERTURA: sparkles rápidos ascendentes (0–2s) ─────────────
-    spark(1318.51,0.18,t+0.05); // E6
-    spark(1174.66,0.15,t+0.25); // D6
-    spark(1108.73,0.14,t+0.45); // C#6
-    spark(987.77, 0.13,t+0.65); // B5
-    spark(880,    0.12,t+0.85); // A5
-    spark(1318.51,0.10,t+1.10); // E6 — eco
-    spark(1108.73,0.09,t+1.35); // C#6
-
-    // ── MELODIA A major — moderna, ascendente, energética ─────────
-    // Frase 1 (2–8s): abertura luminosa
-    ping(659.25,0.20,t+2.0);   // E5
-    ping(739.99,0.18,t+2.9);   // F#5
-    ping(830.61,0.19,t+3.8);   // G#5
-    ping(880,   0.17,t+4.6);   // A5  ← pico da frase
-    ping(739.99,0.15,t+5.5);   // F#5
-    ping(659.25,0.16,t+6.4);   // E5
-    spark(1318.51,0.10,t+7.2); // brilho entre frases
-
-    // Frase 2 (8–14s): mais energia, subindo
-    ping(659.25,0.17,t+8.2);   // E5
-    ping(830.61,0.16,t+9.0);   // G#5
-    ping(987.77,0.18,t+9.9);   // B5
-    ping(1108.73,0.17,t+10.8); // C#6 ← pico mais alto
-    ping(987.77,0.15,t+11.7);  // B5
-    ping(880,   0.14,t+12.5);  // A5
-    spark(1318.51,0.09,t+13.2);
-    spark(1108.73,0.08,t+13.6);
-
-    // Frase 3 (14–20s): dança — A major arpejo rápido
-    ping(880,   0.16,t+14.4);  // A5
-    ping(987.77,0.15,t+15.1);  // B5
-    ping(1108.73,0.16,t+15.8); // C#6
-    ping(880,   0.14,t+16.5);  // A5
-    ping(830.61,0.15,t+17.2);  // G#5
-    ping(739.99,0.14,t+17.9);  // F#5
-    ping(659.25,0.15,t+18.6);  // E5
-    spark(1318.51,0.08,t+19.3);
-
-    // Frase 4 (20–26s): resolução elegante, descendente
-    ping(1108.73,0.14,t+20.5); // C#6
-    ping(987.77,0.13,t+21.4);  // B5
-    ping(880,   0.14,t+22.3);  // A5
-    ping(830.61,0.12,t+23.1);  // G#5
-    ping(739.99,0.13,t+23.9);  // F#5
-    ping(659.25,0.14,t+24.7);  // E5
-
-    // Cascade final de brilho (26–29s)
-    spark(1318.51,0.12,t+26.0);
-    spark(1108.73,0.10,t+26.5);
-    spark(987.77, 0.09,t+27.0);
-    spark(880,    0.10,t+27.5);
-    spark(1318.51,0.07,t+28.0);
-    spark(1108.73,0.06,t+28.5);
-
-  } catch(e) {}
+  _introAudio.play().catch(() => {});
 }
 
 // ── CONFIG ────────────────────────────────────────────────────────
