@@ -179,55 +179,25 @@ html,body{height:100%;overflow:hidden;background:var(--black);font-family:'DM Sa
 #cv{display:none;}
 
 /* Overlay */
-.scan-ov{position:absolute;inset:0;pointer-events:none;z-index:15;}
-.scan-grid-ov{position:absolute;inset:0;opacity:0;background-image:linear-gradient(rgba(201,168,76,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,0.03) 1px,transparent 1px);background-size:28px 28px;transition:opacity .6s;}
-.scan-grid-ov.on{opacity:1;}
+.scan-ov{position:absolute;inset:0;z-index:15;}
 
-/* ══ iOS FACE ID SPOTLIGHT ══
-   box-shadow: 0 0 0 200vmax cria a máscara escura fora do oval.
-   border-radius:50% + aspect-ratio via padding-bottom = oval perfeito.
-   mode-face: oval vertical só no rosto (não no peito).
-   mode-smile: oval horizontal focado na boca/dentes.
-*/
-.face-spotlight{position:absolute;left:50%;transform:translate(-50%,-50%);border-radius:50%;box-shadow:0 0 0 200vmax rgba(0,0,0,0.80);overflow:visible;transition:width .4s,top .4s;}
-.face-spotlight.mode-face{top:31%;width:52%;}
-.face-spotlight.mode-face::after{content:'';display:block;padding-bottom:138%;}
-.face-spotlight.mode-smile{top:53%;width:74%;}
-.face-spotlight.mode-smile::after{content:'';display:block;padding-bottom:37%;}
+/* ══ iOS FACE ID RING ══ */
+.ios-circle-mask{position:absolute;border-radius:50%;box-shadow:0 0 0 200vmax rgba(0,0,0,0.92);z-index:2;pointer-events:none;}
+.ios-ticks-svg{position:absolute;z-index:3;pointer-events:none;}
+.ios-dir-hint{position:absolute;bottom:22%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.72);border:1px solid rgba(255,255,255,0.12);border-radius:30px;padding:9px 22px;display:flex;align-items:center;gap:8px;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;letter-spacing:2px;color:rgba(255,255,255,0.85);white-space:nowrap;z-index:25;}
+.ios-dir-hint span:first-child{font-size:18px;}
 
-/* Borda dourada + pulse */
-.oval-border{position:absolute;inset:0;border-radius:50%;border:1.5px solid rgba(201,168,76,0.85);box-shadow:0 0 16px rgba(201,168,76,0.25) inset;}
-.oval-pulse{position:absolute;inset:-6px;border-radius:50%;border:1px solid rgba(0,212,255,0.4);animation:oPulse 2.2s ease-out infinite;}
-@keyframes oPulse{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.06);opacity:0}}
-
-/* Brackets iOS nos cantos do bounding-box do oval */
-.face-brackets{position:absolute;left:50%;transform:translate(-50%,-50%);pointer-events:none;transition:width .4s,top .4s;}
-.face-brackets.mode-face{top:31%;width:57%;}
-.face-brackets.mode-face::after{content:'';display:block;padding-bottom:138%;}
-.face-brackets.mode-smile{top:53%;width:80%;}
-.face-brackets.mode-smile::after{content:'';display:block;padding-bottom:37%;}
-.face-brackets-inner{position:absolute;inset:0;}
-.br-c{position:absolute;width:22px;height:22px;}
-.br-tl{top:0;left:0;border-top:2.5px solid var(--cyan);border-left:2.5px solid var(--cyan);border-radius:4px 0 0 0;}
-.br-tr{top:0;right:0;border-top:2.5px solid var(--cyan);border-right:2.5px solid var(--cyan);border-radius:0 4px 0 0;}
-.br-bl{bottom:0;left:0;border-bottom:2.5px solid var(--cyan);border-left:2.5px solid var(--cyan);border-radius:0 0 0 4px;}
-.br-br{bottom:0;right:0;border-bottom:2.5px solid var(--cyan);border-right:2.5px solid var(--cyan);border-radius:0 0 4px 0;}
-
-/* Pontos de mapeamento 3D */
-.face-dots-wrap{position:absolute;inset:0;pointer-events:none;}
-.fdot{position:absolute;width:4px;height:4px;margin:-2px 0 0 -2px;border-radius:50%;background:var(--cyan);opacity:0;transform:scale(0);transition:opacity .28s,transform .28s;box-shadow:0 0 5px var(--cyan);}
-.fdot.lit{opacity:.85;transform:scale(1);}
-.fdot.dim{opacity:.2;transform:scale(.4);}
-.sdot{position:absolute;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-radius:50%;background:var(--gold);opacity:0;transform:scale(0);transition:opacity .25s,transform .25s;box-shadow:0 0 5px var(--gold);}
-.sdot.lit{opacity:.9;transform:scale(1);}
-
-/* Scan beam dentro do oval */
-.scan-beam{position:absolute;left:8%;right:8%;height:1px;background:linear-gradient(90deg,transparent,var(--gold),var(--cyan),var(--gold),transparent);box-shadow:0 0 10px var(--gold),0 0 20px var(--cyan);opacity:0;animation:beam 2.5s ease-in-out infinite;}
-@keyframes beam{0%{top:8%;opacity:0}8%{opacity:1}92%{opacity:1}100%{top:92%;opacity:0}}
-
-/* Direction hint */
-.dir-hint{position:absolute;bottom:23%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.88);border:1px solid var(--border);border-radius:30px;padding:10px 22px;display:flex;align-items:center;gap:10px;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600;letter-spacing:1px;white-space:nowrap;z-index:25;}
-.dir-hint-icon{font-size:20px;}
+/* ══ FACE MAP SCREEN ══ */
+#s-face-map{background:#000;padding:0;}
+.fm-header{position:absolute;top:0;left:0;right:0;padding:48px 24px 16px;text-align:center;background:linear-gradient(180deg,rgba(0,0,0,0.96) 0%,transparent 100%);z-index:10;}
+.fm-brand{font-family:'Rajdhani',sans-serif;font-size:11px;letter-spacing:4px;color:var(--cyan);margin-bottom:4px;}
+.fm-title{font-family:'Rajdhani',sans-serif;font-size:19px;font-weight:700;letter-spacing:3px;color:var(--white);}
+.fm-sub{font-family:'Rajdhani',sans-serif;font-size:11px;letter-spacing:2px;color:var(--text-dim);margin-top:6px;}
+#facemapCanvas{position:absolute;inset:0;width:100%;height:100%;}
+.fm-footer{position:absolute;bottom:0;left:0;right:0;padding:18px 24px 44px;background:linear-gradient(0deg,rgba(0,0,0,0.96) 0%,transparent 100%);text-align:center;z-index:10;}
+.fm-count{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;letter-spacing:2px;color:var(--cyan);margin-bottom:10px;}
+.fm-prog{width:200px;height:2px;background:rgba(0,212,255,0.12);border-radius:2px;margin:0 auto;overflow:hidden;}
+.fm-prog-fill{height:100%;background:var(--cyan);border-radius:2px;width:0%;box-shadow:0 0 6px var(--cyan);transition:width .08s linear;}
 
 /* Flash */
 .flash{position:absolute;inset:0;background:white;opacity:0;pointer-events:none;z-index:30;transition:opacity .08s;}
@@ -631,7 +601,7 @@ html,body{height:100%;overflow:hidden;background:var(--black);font-family:'DM Sa
     <div class="scan-brand">BELEZ-AI</div>
     <div class="scan-step" id="sc-step">PASSO 1 DE 3</div>
     <div class="scan-title" id="sc-title">Olhe diretamente para a câmera</div>
-    <div class="scan-sub" id="sc-sub">Centralize APENAS o rosto no oval</div>
+    <div class="scan-sub" id="sc-sub" style="display:none;"></div>
     <div class="scan-prog" id="scanProg">
       <div class="sp-dot w1 active" id="sd0"></div>
       <div class="sp-dot w2" id="sd1"></div>
@@ -644,27 +614,14 @@ html,body{height:100%;overflow:hidden;background:var(--black);font-family:'DM Sa
     <canvas id="cv"></canvas>
 
     <div class="scan-ov">
-      <div class="scan-grid-ov" id="scanGrid"></div>
-
-      <!-- Spotlight oval com máscara escura (iOS Face ID) -->
-      <div class="face-spotlight mode-face" id="faceSpotlight">
-        <div class="oval-border"></div>
-        <div class="oval-pulse"></div>
-        <div class="face-dots-wrap" id="faceDots"></div>
-        <div class="scan-beam" id="scanBeam"></div>
+      <!-- iOS Circle Mask: cria buraco circular no overlay escuro -->
+      <div class="ios-circle-mask" id="iosCircleMask"></div>
+      <!-- iOS Tick Ring SVG: traços verdes animados ao redor do círculo -->
+      <svg class="ios-ticks-svg" id="iosTicks"></svg>
+      <!-- Hint de direção -->
+      <div class="ios-dir-hint" id="dirHint">
+        <span id="dirIcon">⬆️</span><span id="dirTxt">FRENTE</span>
       </div>
-
-      <!-- Brackets iOS nos cantos -->
-      <div class="face-brackets mode-face" id="faceBrackets">
-        <div class="face-brackets-inner">
-          <div class="br-c br-tl"></div>
-          <div class="br-c br-tr"></div>
-          <div class="br-c br-bl"></div>
-          <div class="br-c br-br"></div>
-        </div>
-      </div>
-
-      <div class="dir-hint" id="dirHint"><span class="dir-hint-icon" id="dirIcon">⬆️</span><span id="dirTxt">FRENTE</span></div>
       <div class="flash" id="flash"></div>
     </div>
 
@@ -678,6 +635,20 @@ html,body{height:100%;overflow:hidden;background:var(--black);font-family:'DM Sa
       <button class="cap-btn" onclick="capture()"><div class="cap-inner"></div></button>
       <div class="cap-label" id="capLabel">FOTOGRAFAR</div>
     </div>
+  </div>
+</div>
+
+<!-- ══════════ FACE MAP ══════════ -->
+<div class="screen hidden" id="s-face-map">
+  <canvas id="facemapCanvas"></canvas>
+  <div class="fm-header">
+    <div class="fm-brand">BELEZ-AI</div>
+    <div class="fm-title">MAPEAMENTO FACIAL 3D</div>
+    <div class="fm-sub" id="fmSub">Identificando pontos de referência...</div>
+  </div>
+  <div class="fm-footer">
+    <div class="fm-count" id="fmCount">0 / 33 PONTOS MAPEADOS</div>
+    <div class="fm-prog"><div class="fm-prog-fill" id="fmProgFill"></div></div>
   </div>
 </div>
 
@@ -864,9 +835,9 @@ const CONFIG = {
 // ── STATE ─────────────────────────────────────────────────────────
 let step = 0, photos = [], camStream = null;
 const STEPS = [
-  { step:'PASSO 1 DE 3', title:'Olhe diretamente para a câmera', sub:'Centralize seu rosto no guia oval', icon:'⬆️', dir:'FRENTE' },
-  { step:'PASSO 2 DE 3', title:'Vire o rosto para a esquerda',    sub:'Gire suavemente ~45°, mantenha o oval',  icon:'👈', dir:'ESQUERDA' },
-  { step:'PASSO 3 DE 3', title:'Vire o rosto para a direita',     sub:'Última captura — quase lá!',             icon:'👉', dir:'DIREITA'  },
+  { step:'PASSO 1 DE 3', title:'Posicione o rosto no círculo', sub:'', icon:'⬆️', dir:'FRENTE' },
+  { step:'PASSO 2 DE 3', title:'Vire levemente para a esquerda', sub:'', icon:'👈', dir:'ESQUERDA' },
+  { step:'PASSO 3 DE 3', title:'Vire levemente para a direita',  sub:'', icon:'👉', dir:'DIREITA'  },
 ];
 
 // Populate config into UI
@@ -934,50 +905,218 @@ function checkCode(code) {
 }
 
 // ── SCAN MODE STATE ───────────────────────────────────────────────
-let scanMode = 'face', dotsTimer = null;
+let scanMode = 'face';
 
 const SMILE_STEPS = [
   { step:'PASSO 1 DE 2', title:'Sorria abertamente para a câmera', sub:'Mostre todos os dentes', icon:'😁', dir:'SORRISO' },
   { step:'PASSO 2 DE 2', title:'Abra bem a boca — mostre os dentes', sub:'Queremos ver o alinhamento completo', icon:'🦷', dir:'DENTES' },
 ];
 
-// Landmarks faciais [x%, y%] dentro do bounding-box do oval
-const FACE_LM = [
-  [50,7],[30,14],[70,14],[15,22],[85,22],
-  [26,33],[33,30],[40,33],[26,38],[33,39],[40,38],
-  [60,33],[67,30],[74,33],[60,38],[67,39],[74,38],
-  [50,44],[44,52],[56,52],[50,56],
-  [33,67],[50,63],[67,67],[42,72],[58,72],[50,75],
-  [18,55],[82,55],[22,70],[78,70],[50,90]
-];
-const SMILE_LM = [
-  [12,45],[24,34],[38,28],[50,26],[62,28],[76,34],[88,45],
-  [18,56],[36,68],[50,73],[64,68],[82,56],
-  [28,78],[50,83],[72,78]
+// ── iOS FACE ID RING ──────────────────────────────────────────────
+let iosTicks = [], iosTickInterval = null;
+
+function setupIOSRing() {
+  const mask = document.getElementById('iosCircleMask');
+  const svgEl = document.getElementById('iosTicks');
+  if (!mask || !svgEl) return;
+
+  const sz = Math.min(window.innerWidth * 0.70, 296);
+  const topPx = window.innerHeight * 0.44;
+  const base = `position:absolute;border-radius:50%;pointer-events:none;`;
+
+  mask.style.cssText = `${base}width:${sz}px;height:${sz}px;left:50%;top:${topPx}px;transform:translate(-50%,-50%);box-shadow:0 0 0 200vmax rgba(0,0,0,0.92);z-index:2;`;
+
+  const pad = 52;
+  const svgSz = sz + pad * 2;
+  svgEl.style.cssText = `position:absolute;pointer-events:none;width:${svgSz}px;height:${svgSz}px;left:50%;top:${topPx}px;transform:translate(-50%,-50%);z-index:3;`;
+  svgEl.setAttribute('viewBox', `0 0 ${svgSz} ${svgSz}`);
+  svgEl.innerHTML = '';
+
+  const cx = svgSz / 2, cy = svgSz / 2;
+  const R = sz / 2;
+  const innerR = R + 10, outerR = R + 26;
+  const N = 52;
+  iosTicks = [];
+
+  for (let i = 0; i < N; i++) {
+    const angle = (i / N) * Math.PI * 2 - Math.PI / 2;
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', cx + Math.cos(angle) * innerR);
+    line.setAttribute('y1', cy + Math.sin(angle) * innerR);
+    line.setAttribute('x2', cx + Math.cos(angle) * outerR);
+    line.setAttribute('y2', cy + Math.sin(angle) * outerR);
+    line.setAttribute('stroke', 'rgba(255,255,255,0.10)');
+    line.setAttribute('stroke-width', '3');
+    line.setAttribute('stroke-linecap', 'round');
+    svgEl.appendChild(line);
+    iosTicks.push(line);
+  }
+}
+
+function animateIOSTicks() {
+  clearInterval(iosTickInterval);
+  iosTicks.forEach(t => { t.setAttribute('stroke','rgba(255,255,255,0.10)'); t.setAttribute('stroke-width','3'); });
+  let i = 0;
+  iosTickInterval = setInterval(() => {
+    if (i >= iosTicks.length) {
+      clearInterval(iosTickInterval);
+      setTimeout(() => {
+        iosTicks.forEach(t => t.setAttribute('stroke','rgba(255,255,255,0.10)'));
+        animateIOSTicks();
+      }, 1600);
+      return;
+    }
+    iosTicks[i].setAttribute('stroke', '#30d158');
+    iosTicks[i].setAttribute('stroke-width', '3.5');
+    i++;
+  }, 50);
+}
+
+function stopIOSTicks() {
+  clearInterval(iosTickInterval);
+  iosTicks.forEach(t => { t.setAttribute('stroke','#30d158'); t.setAttribute('stroke-width','3.5'); });
+}
+
+// ── FACE LANDMARK MAP ─────────────────────────────────────────────
+const FACE_LMS = [
+  [35, 8,  'RMidForehead', 'L'],
+  [65, 8,  'LMidForehead', 'R'],
+  [20, 23, 'REyebrowEnd',  'L'],
+  [31, 19, 'REyebrowMid',  'L'],
+  [69, 19, 'LEyebrowMid',  'R'],
+  [80, 23, 'LEyebrowEnd',  'R'],
+  [28, 29, 'ROrbitalUpper','L'],
+  [72, 29, 'LOrbitalUpper','R'],
+  [32, 35, 'REyelidUpper', 'L'],
+  [50, 33, 'NoseBridge',   'L'],
+  [68, 35, 'LEyelidUpper', 'R'],
+  [32, 42, 'REyelidLower', 'L'],
+  [68, 42, 'LEyelidLower', 'R'],
+  [ 4, 46, 'REar',         'L'],
+  [21, 45, 'ROrbitalLower','L'],
+  [79, 45, 'LOrbitalLower','R'],
+  [96, 46, 'LEar',         'R'],
+  [38, 55, 'RNostrilBulge','L'],
+  [50, 58, 'NoseTip',      'L'],
+  [62, 55, 'LNostrilBulge','R'],
+  [38, 63, 'RNostrilBase', 'L'],
+  [62, 63, 'LNostrilBase', 'R'],
+  [50, 67, 'LipUpper',     'R'],
+  [26, 70, 'RPuffer',      'L'],
+  [36, 68, 'RMouthCorner', 'L'],
+  [64, 68, 'LMouthCorner', 'R'],
+  [74, 70, 'LPuffer',      'R'],
+  [40, 72, 'RLipUpperBend','L'],
+  [60, 72, 'LLipUpperBend','R'],
+  [40, 78, 'RLipLowerBend','L'],
+  [50, 80, 'LipLower',     'R'],
+  [60, 78, 'LLipLowerBend','R'],
+  [50, 92, 'Chin',         'L'],
 ];
 
-function startFaceDots() {
-  clearTimeout(dotsTimer);
-  const wrap = document.getElementById('faceDots');
-  wrap.innerHTML = '';
-  const lms = scanMode === 'smile' ? SMILE_LM : FACE_LM;
-  const cls = scanMode === 'smile' ? 'sdot' : 'fdot';
-  const dots = lms.map(([x,y]) => {
-    const d = document.createElement('div');
-    d.className = cls; d.style.left = x+'%'; d.style.top = y+'%';
-    wrap.appendChild(d); return d;
-  });
-  let i = 0;
-  function tick() {
-    if (i < dots.length) {
-      dots[i].classList.add('lit');
-      if (i >= 6) dots[i-6].classList.add('dim');
-      i++; dotsTimer = setTimeout(tick, 70);
-    } else {
-      dotsTimer = setTimeout(() => { dots.forEach(d => d.classList.remove('lit','dim')); i=0; dotsTimer = setTimeout(tick,700); }, 2000);
+let fmAnimId = null;
+
+function startFaceMap(photo) {
+  goTo('s-face-map');
+  const canvas = document.getElementById('facemapCanvas');
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+  document.getElementById('fmSub').textContent = 'Identificando pontos de referência...';
+
+  const img = new Image();
+  img.onload = () => {
+    let startTs = null;
+    const dur = 4000;
+    function frame(ts) {
+      if (!startTs) startTs = ts;
+      const t = Math.min((ts - startTs) / dur, 1);
+      drawFM(canvas, img, t);
+      const cnt = Math.floor(t * FACE_LMS.length);
+      document.getElementById('fmCount').textContent = `${cnt} / ${FACE_LMS.length} PONTOS MAPEADOS`;
+      document.getElementById('fmProgFill').style.width = (t * 100) + '%';
+      if (t < 1) {
+        fmAnimId = requestAnimationFrame(frame);
+      } else {
+        document.getElementById('fmSub').textContent = 'Mapeamento completo ✓';
+        setTimeout(doAnalysis, 900);
+      }
     }
+    fmAnimId = requestAnimationFrame(frame);
+  };
+  img.src = photo;
+}
+
+function drawFM(canvas, img, progress) {
+  const W = canvas.width, H = canvas.height;
+  const ctx = canvas.getContext('2d');
+
+  // Cover-fit photo
+  const scale = Math.max(W / img.width, H / img.height);
+  const iw = img.width * scale, ih = img.height * scale;
+  ctx.drawImage(img, (W - iw) / 2, (H - ih) / 2, iw, ih);
+
+  // Dark professional overlay
+  ctx.fillStyle = 'rgba(0,4,14,0.54)';
+  ctx.fillRect(0, 0, W, H);
+
+  // Scan line sweeping down
+  if (progress < 0.96) {
+    const sy = progress * H;
+    const lg = ctx.createLinearGradient(0, sy - 90, 0, sy + 6);
+    lg.addColorStop(0, 'rgba(0,212,255,0)');
+    lg.addColorStop(1, 'rgba(0,212,255,0.07)');
+    ctx.fillStyle = lg;
+    ctx.fillRect(0, sy - 90, W, 96);
+    ctx.strokeStyle = 'rgba(0,212,255,0.6)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, sy); ctx.lineTo(W, sy); ctx.stroke();
   }
-  dotsTimer = setTimeout(tick, 500);
+
+  // Face region heuristic (portrait)
+  const fL = W * 0.06, fR = W * 0.94, fT = H * 0.06, fB = H * 0.93;
+  const fW = fR - fL, fH = fB - fT;
+  const count = Math.floor(progress * FACE_LMS.length);
+
+  ctx.font = '9.5px "Rajdhani", monospace';
+  ctx.textBaseline = 'middle';
+
+  for (let i = 0; i < count; i++) {
+    const [xp, yp, label, side] = FACE_LMS[i];
+    const x = fL + (xp / 100) * fW;
+    const y = fT + (yp / 100) * fH;
+
+    // Glow halo
+    const gr = ctx.createRadialGradient(x, y, 0, x, y, 10);
+    gr.addColorStop(0, 'rgba(0,212,255,0.55)');
+    gr.addColorStop(1, 'rgba(0,212,255,0)');
+    ctx.fillStyle = gr;
+    ctx.beginPath(); ctx.arc(x, y, 10, 0, Math.PI * 2); ctx.fill();
+
+    // Outer ring
+    ctx.strokeStyle = 'rgba(0,212,255,0.65)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.stroke();
+
+    // Dot fill
+    ctx.fillStyle = '#00d4ff';
+    ctx.beginPath(); ctx.arc(x, y, 2.8, 0, Math.PI * 2); ctx.fill();
+
+    // White center
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath(); ctx.arc(x, y, 1.1, 0, Math.PI * 2); ctx.fill();
+
+    // Label line + text
+    const isL = side === 'L';
+    const lineLen = Math.min(44, isL ? x - fL - 4 : fR - x - 4);
+    const lx = isL ? x - lineLen : x + lineLen;
+    ctx.strokeStyle = 'rgba(0,212,255,0.32)';
+    ctx.lineWidth = 0.7;
+    ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(lx, y); ctx.stroke();
+
+    ctx.fillStyle = 'rgba(200,235,255,0.90)';
+    ctx.textAlign = isL ? 'right' : 'left';
+    ctx.fillText(label, isL ? lx - 3 : lx + 3, y);
+  }
 }
 
 // ── SCAN ──────────────────────────────────────────────────────────
@@ -986,11 +1125,9 @@ async function startScan(mode) {
   goTo('s-scan');
   step = 0; photos = [];
 
-  // Alterna modo do overlay
-  document.getElementById('faceSpotlight').className = `face-spotlight mode-${scanMode}`;
-  document.getElementById('faceBrackets').className = `face-brackets mode-${scanMode}`;
-
+  setupIOSRing();
   resetScanUI();
+
   try {
     camStream = await navigator.mediaDevices.getUserMedia({
       video:{facingMode:'user',width:{ideal:1280},height:{ideal:960}}, audio:false
@@ -1000,10 +1137,7 @@ async function startScan(mode) {
     toast('Câmera não disponível. Verifique as permissões.','error');
     return;
   }
-  setTimeout(() => {
-    document.getElementById('scanGrid').classList.add('on');
-    startFaceDots();
-  }, 700);
+  setTimeout(() => animateIOSTicks(), 700);
 }
 
 function getSteps() { return scanMode === 'smile' ? SMILE_STEPS : STEPS; }
@@ -1066,18 +1200,21 @@ function capture() {
     document.getElementById(`sd${step}`).classList.add('active');
     updateScanUI(step);
   } else {
-    clearTimeout(dotsTimer);
     startAnalysis();
   }
 }
 
 // ── ANALYSIS ──────────────────────────────────────────────────────
 async function startAnalysis() {
-  clearTimeout(dotsTimer);
   if (camStream) camStream.getTracks().forEach(t=>t.stop());
+  stopIOSTicks();
+  // Mostra face map primeiro, depois chama doAnalysis()
+  startFaceMap(photos[0]);
+}
+
+async function doAnalysis() {
   document.getElementById('s-analyzing').classList.add('show');
 
-  // Animate steps
   const ids = ['an1','an2','an3','an4','an5'];
   const delays = [0,1200,2400,3500,4600];
   ids.forEach((id,i) => {
