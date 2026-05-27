@@ -458,7 +458,34 @@ html,body{height:100%;overflow:hidden;background:var(--black);font-family:'DM Sa
 .btn-adm-enter:active{opacity:.8;}
 .btn-adm-cancel{width:100%;height:44px;border-radius:12px;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;cursor:pointer;}
 
-/* ── ADMIN PANEL ── */
+/* ══ DENTAL MAP ══ */
+#s-dental-map{background:#000;padding:0;}
+.dm-header{position:absolute;top:0;left:0;right:0;padding:48px 24px 16px;text-align:center;background:linear-gradient(180deg,rgba(0,0,0,0.96) 0%,transparent 100%);z-index:10;}
+.dm-brand{font-family:'Rajdhani',sans-serif;font-size:11px;letter-spacing:4px;color:var(--cyan);margin-bottom:4px;}
+.dm-title{font-family:'Rajdhani',sans-serif;font-size:19px;font-weight:700;letter-spacing:3px;color:var(--white);}
+.dm-sub{font-family:'Rajdhani',sans-serif;font-size:11px;letter-spacing:2px;color:var(--text-dim);margin-top:6px;}
+#dentalmapCanvas{position:absolute;inset:0;width:100%;height:100%;}
+.dm-footer{position:absolute;bottom:0;left:0;right:0;padding:18px 24px 44px;background:linear-gradient(0deg,rgba(0,0,0,0.96) 0%,transparent 100%);text-align:center;z-index:10;}
+.dm-count{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;letter-spacing:2px;color:var(--cyan);margin-bottom:10px;}
+.dm-prog{width:200px;height:2px;background:rgba(0,212,255,0.12);border-radius:2px;margin:0 auto;overflow:hidden;}
+.dm-prog-fill{height:100%;background:var(--cyan);border-radius:2px;width:0%;box-shadow:0 0 6px var(--cyan);transition:width .08s linear;}
+
+/* ══ SCAN QUALITY ══ */
+.scan-quality{position:absolute;top:138px;left:50%;transform:translateX(-50%);z-index:25;display:flex;align-items:center;gap:7px;background:rgba(0,0,0,0.68);border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:5px 14px;white-space:nowrap;}
+.sq-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.sq-label{font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:600;letter-spacing:1.5px;color:rgba(255,255,255,0.65);}
+
+/* ══ FLIP CAMERA ══ */
+.flip-btn{position:absolute;bottom:5%;right:22px;width:52px;height:52px;border-radius:50%;background:rgba(0,0,0,0.60);border:1.5px solid rgba(255,255,255,0.22);color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:20;transition:background .2s,transform .3s cubic-bezier(.34,1.56,.64,1);}
+.flip-btn:active{background:rgba(255,255,255,0.15);}
+.flip-btn.spinning{transform:rotate(180deg);}
+
+/* ══ SMILE OVERLAY ══ */
+.smile-oval-mask{position:absolute;border-radius:50%;box-shadow:0 0 0 200vmax rgba(0,0,0,0.92);z-index:2;pointer-events:none;}
+.smile-ticks-svg{position:absolute;z-index:3;pointer-events:none;}
+.smile-dir-hint{position:absolute;bottom:22%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.72);border:1px solid rgba(0,212,255,0.25);border-radius:30px;padding:9px 22px;display:flex;align-items:center;gap:8px;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;letter-spacing:2px;color:rgba(0,212,255,0.9);white-space:nowrap;z-index:25;}
+
+/* ══ ADMIN PANEL ══ */
 #s-admin{padding:0;justify-content:flex-start;}
 .adm-header{width:100%;padding:48px 24px 20px;text-align:center;background:linear-gradient(180deg,rgba(201,168,76,0.1),transparent);border-bottom:1px solid var(--border);}
 .adm-header-logo{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;letter-spacing:3px;color:var(--gold);margin-bottom:4px;}
@@ -709,11 +736,18 @@ html,body{height:100%;overflow:hidden;background:var(--black);font-family:'DM Sa
     <canvas id="cv"></canvas>
 
     <div class="scan-ov">
-      <!-- iOS Circle Mask: cria buraco circular no overlay escuro -->
+      <!-- Indicador de qualidade de iluminação -->
+      <div class="scan-quality" id="scanQuality">
+        <div class="sq-dot" style="background:var(--text-dim);"></div>
+        <div class="sq-label">VERIFICANDO LUZ…</div>
+      </div>
+      <!-- iOS Circle Mask: face scan -->
       <div class="ios-circle-mask" id="iosCircleMask"></div>
-      <!-- iOS Tick Ring SVG: traços verdes animados ao redor do círculo -->
       <svg class="ios-ticks-svg" id="iosTicks"></svg>
-      <!-- Hint de direção -->
+      <!-- Smile Oval Mask: dental scan -->
+      <div class="smile-oval-mask" id="smileOvalMask" style="display:none;"></div>
+      <svg class="smile-ticks-svg" id="smileTicks" style="display:none;"></svg>
+      <!-- Hint de direção (compartilhado) -->
       <div class="ios-dir-hint" id="dirHint">
         <span id="dirIcon">⬆️</span><span id="dirTxt">FRENTE</span>
       </div>
@@ -730,6 +764,10 @@ html,body{height:100%;overflow:hidden;background:var(--black);font-family:'DM Sa
       <button class="cap-btn" onclick="capture()"><div class="cap-inner"></div></button>
       <div class="cap-label" id="capLabel">FOTOGRAFAR</div>
     </div>
+
+    <button class="flip-btn" id="flipBtn" onclick="flipCamera()" title="Virar câmera">
+      🔄
+    </button>
   </div>
 </div>
 
@@ -744,6 +782,20 @@ html,body{height:100%;overflow:hidden;background:var(--black);font-family:'DM Sa
   <div class="fm-footer">
     <div class="fm-count" id="fmCount">0 / 33 PONTOS MAPEADOS</div>
     <div class="fm-prog"><div class="fm-prog-fill" id="fmProgFill"></div></div>
+  </div>
+</div>
+
+<!-- ══════════ DENTAL MAP ══════════ -->
+<div class="screen hidden" id="s-dental-map">
+  <canvas id="dentalmapCanvas"></canvas>
+  <div class="dm-header">
+    <div class="dm-brand">BELEZ-AI</div>
+    <div class="dm-title">MAPEAMENTO DENTAL 3D</div>
+    <div class="dm-sub" id="dmSub">Identificando estrutura dental...</div>
+  </div>
+  <div class="dm-footer">
+    <div class="dm-count" id="dmCount">0 / 28 PONTOS MAPEADOS</div>
+    <div class="dm-prog"><div class="dm-prog-fill" id="dmProgFill"></div></div>
   </div>
 </div>
 
@@ -875,10 +927,12 @@ function checkCode(code) {
 
 // ── SCAN MODE STATE ───────────────────────────────────────────────
 let scanMode = 'face';
+let facingMode = 'user';
 
 const SMILE_STEPS = [
-  { step:'PASSO 1 DE 2', title:'Sorria abertamente para a câmera', sub:'Mostre todos os dentes', icon:'😁', dir:'SORRISO' },
-  { step:'PASSO 2 DE 2', title:'Abra bem a boca — mostre os dentes', sub:'Queremos ver o alinhamento completo', icon:'🦷', dir:'DENTES' },
+  { step:'PASSO 1 DE 3', title:'Sorria abertamente para a câmera', sub:'Mostre todos os dentes', icon:'😁', dir:'SORRISO' },
+  { step:'PASSO 2 DE 3', title:'Mostre os dentes superiores', sub:'Eleve levemente o lábio superior', icon:'🦷', dir:'SUPERIOR' },
+  { step:'PASSO 3 DE 3', title:'Mostre a mordida completa', sub:'Feche levemente e mostre a linha', icon:'🤭', dir:'MORDIDA' },
 ];
 
 // ── iOS FACE ID RING ──────────────────────────────────────────────
@@ -984,6 +1038,155 @@ const FACE_LMS = [
 ];
 
 let fmAnimId = null;
+let dmAnimId = null;
+
+// ── DENTAL LANDMARKS ──────────────────────────────────────────────
+const DENTAL_LMS = [
+  // Gengiva superior
+  [28,28,'GS-Esq','L'],[36,24,'GS-CuspE','L'],[44,21,'GS-Cent','L'],
+  [56,21,'GS-Cent','R'],[64,24,'GS-CuspD','R'],[72,28,'GS-Dir','R'],
+  // Dentes superiores (8 visíveis)
+  [24,34,'I1-Esq','L'],[32,31,'I2-Esq','L'],[40,29,'I3-Esq','L'],[48,28,'IC-Esq','L'],
+  [52,28,'IC-Dir','R'],[60,29,'I3-Dir','R'],[68,31,'I2-Dir','R'],[76,34,'I1-Dir','R'],
+  // Linha média
+  [50,42,'LinMed','L'],
+  // Dentes inferiores (8 visíveis)
+  [24,60,'DI1-Esq','L'],[32,62,'DI2-Esq','L'],[40,64,'DI3-Esq','L'],[48,65,'DIC-Esq','L'],
+  [52,65,'DIC-Dir','R'],[60,64,'DI3-Dir','R'],[68,62,'DI2-Dir','R'],[76,60,'DI1-Dir','R'],
+  // Gengiva inferior
+  [28,70,'GI-Esq','L'],[44,75,'GI-Cent','L'],[56,75,'GI-Cent','R'],[72,70,'GI-Dir','R'],
+];
+
+function startDentalMap(photo) {
+  goTo('s-dental-map');
+  const canvas = document.getElementById('dentalmapCanvas');
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+  document.getElementById('dmSub').textContent = 'Identificando estrutura dental...';
+
+  const img = new Image();
+  img.onload = () => {
+    let startTs = null;
+    const dur = 4200;
+    function frame(ts) {
+      if (!startTs) startTs = ts;
+      const t = Math.min((ts - startTs) / dur, 1);
+      drawDentalMap(canvas, img, t);
+      const cnt = Math.floor(t * DENTAL_LMS.length);
+      document.getElementById('dmCount').textContent = `${cnt} / ${DENTAL_LMS.length} PONTOS MAPEADOS`;
+      document.getElementById('dmProgFill').style.width = (t * 100) + '%';
+      if (t < 0.4) {
+        document.getElementById('dmSub').textContent = 'Identificando estrutura dental...';
+      } else if (t < 0.7) {
+        document.getElementById('dmSub').textContent = 'Analisando tonalidade e alinhamento...';
+      } else {
+        document.getElementById('dmSub').textContent = 'Avaliando saúde periodontal...';
+      }
+      if (t < 1) {
+        dmAnimId = requestAnimationFrame(frame);
+      } else {
+        document.getElementById('dmSub').textContent = 'Mapeamento dental completo ✓';
+        setTimeout(doAnalysis, 900);
+      }
+    }
+    dmAnimId = requestAnimationFrame(frame);
+  };
+  img.src = photo;
+}
+
+function drawDentalMap(canvas, img, progress) {
+  const W = canvas.width, H = canvas.height;
+  const ctx = canvas.getContext('2d');
+
+  // Cover-fit photo
+  const scale = Math.max(W / img.width, H / img.height);
+  const iw = img.width * scale, ih = img.height * scale;
+  ctx.drawImage(img, (W - iw) / 2, (H - ih) / 2, iw, ih);
+
+  // Dark overlay
+  ctx.fillStyle = 'rgba(0,4,14,0.58)';
+  ctx.fillRect(0, 0, W, H);
+
+  // Scan line
+  if (progress < 0.96) {
+    const sy = H * 0.25 + progress * H * 0.55;
+    const lg = ctx.createLinearGradient(0, sy - 60, 0, sy + 6);
+    lg.addColorStop(0, 'rgba(0,212,255,0)');
+    lg.addColorStop(1, 'rgba(0,212,255,0.09)');
+    ctx.fillStyle = lg;
+    ctx.fillRect(0, sy - 60, W, 66);
+    ctx.strokeStyle = 'rgba(0,212,255,0.65)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, sy); ctx.lineTo(W, sy); ctx.stroke();
+  }
+
+  // Dental region — centered on mouth area
+  const fL = W * 0.12, fR = W * 0.88, fT = H * 0.28, fB = H * 0.76;
+  const fW = fR - fL, fH = fB - fT;
+  const count = Math.floor(progress * DENTAL_LMS.length);
+
+  // Draw connecting lines between upper teeth first (subtle)
+  if (progress > 0.3) {
+    const alpha = Math.min((progress - 0.3) / 0.3, 1) * 0.25;
+    ctx.strokeStyle = `rgba(0,212,255,${alpha})`;
+    ctx.lineWidth = 0.6;
+    const uppers = DENTAL_LMS.slice(6, 14);
+    ctx.beginPath();
+    uppers.forEach((lm, i) => {
+      const x = fL + (lm[0] / 100) * fW;
+      const y = fT + (lm[1] / 100) * fH;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+    const lowers = DENTAL_LMS.slice(15, 23);
+    ctx.beginPath();
+    lowers.forEach((lm, i) => {
+      const x = fL + (lm[0] / 100) * fW;
+      const y = fT + (lm[1] / 100) * fH;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+  }
+
+  ctx.font = '9px "Rajdhani", monospace';
+  ctx.textBaseline = 'middle';
+
+  for (let i = 0; i < count; i++) {
+    const [xp, yp, label, side] = DENTAL_LMS[i];
+    const x = fL + (xp / 100) * fW;
+    const y = fT + (yp / 100) * fH;
+
+    // Glow
+    const gr = ctx.createRadialGradient(x, y, 0, x, y, 10);
+    gr.addColorStop(0, 'rgba(0,212,255,0.55)');
+    gr.addColorStop(1, 'rgba(0,212,255,0)');
+    ctx.fillStyle = gr;
+    ctx.beginPath(); ctx.arc(x, y, 10, 0, Math.PI * 2); ctx.fill();
+
+    // Ring
+    ctx.strokeStyle = 'rgba(0,212,255,0.65)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(x, y, 3.5, 0, Math.PI * 2); ctx.stroke();
+
+    // Dot
+    ctx.fillStyle = '#00d4ff';
+    ctx.beginPath(); ctx.arc(x, y, 2.2, 0, Math.PI * 2); ctx.fill();
+
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath(); ctx.arc(x, y, 0.8, 0, Math.PI * 2); ctx.fill();
+
+    // Label
+    const isL = side === 'L';
+    const lineLen = Math.min(36, isL ? x - fL - 4 : fR - x - 4);
+    const lx = isL ? x - lineLen : x + lineLen;
+    ctx.strokeStyle = 'rgba(0,212,255,0.28)';
+    ctx.lineWidth = 0.6;
+    ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(lx, y); ctx.stroke();
+    ctx.fillStyle = 'rgba(180,230,255,0.85)';
+    ctx.textAlign = isL ? 'right' : 'left';
+    ctx.fillText(label, isL ? lx - 2 : lx + 2, y);
+  }
+}
 
 function startFaceMap(photo) {
   goTo('s-face-map');
@@ -1088,25 +1291,179 @@ function drawFM(canvas, img, progress) {
   }
 }
 
+// ── SMILE OVERLAY (dental scan) ───────────────────────────────────
+let smileTicks = [], smileTickInterval = null;
+
+function setupSmileOverlay() {
+  const mask  = document.getElementById('smileOvalMask');
+  const svgEl = document.getElementById('smileTicks');
+  const face  = document.getElementById('iosCircleMask');
+  const faceS = document.getElementById('iosTicks');
+  if (!mask || !svgEl) return;
+
+  // Hide face ring, show smile ring
+  face.style.display  = 'none';
+  faceS.style.display = 'none';
+  mask.style.display  = '';
+  svgEl.style.display = '';
+
+  // Oval wider than tall — mouth shape
+  const ow = Math.min(window.innerWidth * 0.72, 300);
+  const oh = ow * 0.48;
+  const topPx = window.innerHeight * 0.50;
+
+  mask.style.cssText = `position:absolute;pointer-events:none;width:${ow}px;height:${oh}px;left:50%;top:${topPx}px;transform:translate(-50%,-50%);box-shadow:0 0 0 200vmax rgba(0,0,0,0.92);z-index:2;border-radius:50%;`;
+
+  const pad = 40;
+  const svgW = ow + pad * 2, svgH = oh + pad * 2;
+  svgEl.style.cssText = `position:absolute;pointer-events:none;width:${svgW}px;height:${svgH}px;left:50%;top:${topPx}px;transform:translate(-50%,-50%);z-index:3;`;
+  svgEl.setAttribute('viewBox', `0 0 ${svgW} ${svgH}`);
+  svgEl.innerHTML = '';
+
+  const cx = svgW / 2, cy = svgH / 2;
+  const rx = ow / 2 + 12, ry = oh / 2 + 12;
+  const N = 48;
+  smileTicks = [];
+
+  for (let i = 0; i < N; i++) {
+    const angle = (i / N) * Math.PI * 2 - Math.PI / 2;
+    const xOuter = cx + Math.cos(angle) * (rx + 14);
+    const yOuter = cy + Math.sin(angle) * (ry + 14);
+    const xInner = cx + Math.cos(angle) * rx;
+    const yInner = cy + Math.sin(angle) * ry;
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', xInner); line.setAttribute('y1', yInner);
+    line.setAttribute('x2', xOuter); line.setAttribute('y2', yOuter);
+    line.setAttribute('stroke', 'rgba(0,212,255,0.12)');
+    line.setAttribute('stroke-width', '2.5');
+    line.setAttribute('stroke-linecap', 'round');
+    svgEl.appendChild(line);
+    smileTicks.push(line);
+  }
+
+  // Update hint pill color for dental mode
+  const hint = document.getElementById('dirHint');
+  if (hint) hint.style.borderColor = 'rgba(0,212,255,0.3)';
+}
+
+function animateSmileTicks() {
+  clearInterval(smileTickInterval);
+  smileTicks.forEach(t => { t.setAttribute('stroke','rgba(0,212,255,0.12)'); t.setAttribute('stroke-width','2.5'); });
+  let i = 0;
+  smileTickInterval = setInterval(() => {
+    if (i >= smileTicks.length) {
+      clearInterval(smileTickInterval);
+      setTimeout(() => {
+        smileTicks.forEach(t => t.setAttribute('stroke','rgba(0,212,255,0.12)'));
+        animateSmileTicks();
+      }, 1600);
+      return;
+    }
+    smileTicks[i].setAttribute('stroke', '#00d4ff');
+    smileTicks[i].setAttribute('stroke-width', '3');
+    i++;
+  }, 50);
+}
+
+function stopSmileTicks() {
+  clearInterval(smileTickInterval);
+  smileTicks.forEach(t => { t.setAttribute('stroke','#00d4ff'); t.setAttribute('stroke-width','3'); });
+}
+
+// ── QUALITY CHECK (brightness) ────────────────────────────────────
+let _qualityInterval = null;
+function startQualityCheck() {
+  clearInterval(_qualityInterval);
+  _qualityInterval = setInterval(() => {
+    const vid = document.getElementById('video');
+    if (!vid || vid.readyState < 2) return;
+    const tmp = document.createElement('canvas');
+    tmp.width = 80; tmp.height = 60;
+    const ctx = tmp.getContext('2d');
+    try { ctx.drawImage(vid, 0, 0, 80, 60); } catch(e){ return; }
+    const d = ctx.getImageData(0, 0, 80, 60).data;
+    let b = 0;
+    for (let i = 0; i < d.length; i += 4) b += (d[i]*299 + d[i+1]*587 + d[i+2]*114) / 1000;
+    b /= (80 * 60);
+    const qEl = document.getElementById('scanQuality');
+    if (!qEl) return;
+    if (b < 55) {
+      qEl.innerHTML = `<div class="sq-dot" style="background:#ff6b4a;box-shadow:0 0 5px #ff6b4a80;"></div><div class="sq-label">ILUMINAÇÃO FRACA</div>`;
+    } else if (b < 100) {
+      qEl.innerHTML = `<div class="sq-dot" style="background:#c9a84c;box-shadow:0 0 5px #c9a84c80;"></div><div class="sq-label">ILUMINAÇÃO OK</div>`;
+    } else {
+      qEl.innerHTML = `<div class="sq-dot" style="background:#00e5a0;box-shadow:0 0 5px #00e5a080;"></div><div class="sq-label">ILUMINAÇÃO BOA</div>`;
+    }
+  }, 1200);
+}
+function stopQualityCheck() { clearInterval(_qualityInterval); }
+
 // ── SCAN ──────────────────────────────────────────────────────────
+async function flipCamera() {
+  if (!camStream) return;
+  facingMode = facingMode === 'user' ? 'environment' : 'user';
+
+  // Animação de rotação no botão
+  const btn = document.getElementById('flipBtn');
+  if (btn) btn.classList.add('spinning');
+  setTimeout(() => { if (btn) btn.classList.remove('spinning'); }, 350);
+
+  camStream.getTracks().forEach(t => t.stop());
+  try {
+    camStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode, width: { ideal: 1280 }, height: { ideal: 960 } },
+      audio: false
+    });
+    document.getElementById('video').srcObject = camStream;
+  } catch(e) {
+    // reverte se câmera traseira não disponível
+    facingMode = facingMode === 'user' ? 'environment' : 'user';
+    toast('Câmera traseira não disponível', 'error');
+    // retoma câmera frontal
+    try {
+      camStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode, width: { ideal: 1280 }, height: { ideal: 960 } },
+        audio: false
+      });
+      document.getElementById('video').srcObject = camStream;
+    } catch(e2) {}
+  }
+}
+
 async function startScan(mode) {
   scanMode = mode || 'face';
+  facingMode = 'user'; // sempre inicia com câmera frontal
   goTo('s-scan');
   step = 0; photos = [];
 
-  setupIOSRing();
+  // Reset overlays
+  document.getElementById('iosCircleMask').style.display = scanMode === 'face' ? '' : 'none';
+  document.getElementById('iosTicks').style.display      = scanMode === 'face' ? '' : 'none';
+  document.getElementById('smileOvalMask').style.display = scanMode === 'smile' ? '' : 'none';
+  document.getElementById('smileTicks').style.display    = scanMode === 'smile' ? '' : 'none';
+
+  if (scanMode === 'face') {
+    setupIOSRing();
+  } else {
+    setupSmileOverlay();
+  }
   resetScanUI();
 
   try {
     camStream = await navigator.mediaDevices.getUserMedia({
-      video:{facingMode:'user',width:{ideal:1280},height:{ideal:960}}, audio:false
+      video:{ facingMode, width:{ideal:1280}, height:{ideal:960} }, audio:false
     });
     document.getElementById('video').srcObject = camStream;
   } catch(e) {
     toast('Câmera não disponível. Verifique as permissões.','error');
     return;
   }
-  setTimeout(() => animateIOSTicks(), 700);
+
+  setTimeout(() => {
+    if (scanMode === 'face') animateIOSTicks();
+    else animateSmileTicks();
+    startQualityCheck();
+  }, 700);
 }
 
 function getSteps() { return scanMode === 'smile' ? SMILE_STEPS : STEPS; }
@@ -1176,13 +1533,40 @@ function capture() {
 // ── ANALYSIS ──────────────────────────────────────────────────────
 async function startAnalysis() {
   if (camStream) camStream.getTracks().forEach(t=>t.stop());
-  stopIOSTicks();
-  // Mostra face map primeiro, depois chama doAnalysis()
-  startFaceMap(photos[0]);
+  stopQualityCheck();
+  if (scanMode === 'face') {
+    stopIOSTicks();
+    startFaceMap(photos[0]);
+  } else {
+    stopSmileTicks();
+    startDentalMap(photos[0]);
+  }
 }
 
 async function doAnalysis() {
-  document.getElementById('s-analyzing').classList.add('show');
+  const el = document.getElementById('s-analyzing');
+  el.classList.add('show');
+
+  // Atualiza título e steps conforme o modo
+  const titleEl = el.querySelector('.an-title');
+  const subEl   = el.querySelector('.an-sub');
+  if (scanMode === 'smile') {
+    if (titleEl) titleEl.textContent = 'Analisando seu sorriso…';
+    if (subEl)   subEl.textContent   = 'Nossa IA está processando as imagens e criando seu relatório dental personalizado';
+    document.getElementById('an1').childNodes[1].textContent = 'Detectando estrutura dental';
+    document.getElementById('an2').childNodes[1].textContent = 'Analisando tonalidade e clareamento';
+    document.getElementById('an3').childNodes[1].textContent = 'Avaliando alinhamento e mordida';
+    document.getElementById('an4').childNodes[1].textContent = 'Analisando gengiva e saúde periodontal';
+    document.getElementById('an5').childNodes[1].textContent = 'Gerando recomendações personalizadas';
+  } else {
+    if (titleEl) titleEl.textContent = 'Analisando seu rosto…';
+    if (subEl)   subEl.textContent   = 'Nossa IA está processando as imagens e criando seu relatório personalizado';
+    document.getElementById('an1').childNodes[1].textContent = 'Detectando estrutura facial';
+    document.getElementById('an2').childNodes[1].textContent = 'Analisando textura e hidratação';
+    document.getElementById('an3').childNodes[1].textContent = 'Mapeando linhas de expressão';
+    document.getElementById('an4').childNodes[1].textContent = 'Avaliando saúde dental';
+    document.getElementById('an5').childNodes[1].textContent = 'Gerando recomendações personalizadas';
+  }
 
   const ids = ['an1','an2','an3','an4','an5'];
   const delays = [0,1200,2400,3500,4600];
@@ -1196,7 +1580,7 @@ async function doAnalysis() {
 
   let result;
   try { result = await callClaude(); }
-  catch(e) { result = mockResult(); }
+  catch(e) { result = scanMode === 'smile' ? mockSmileResult() : mockResult(); }
 
   setTimeout(() => {
     ids.forEach(x => document.getElementById(x).classList.add('done'));
@@ -1241,18 +1625,154 @@ function mockResult(){
   };
 }
 
+function mockSmileResult() {
+  return {
+    score: 74, grade: 'Bom', scanType: 'smile',
+    summary: 'Sorriso natural com bom alinhamento e grande potencial para clareamento!',
+    age_estimated: 28, skin_tone: 'Tom natural',
+    skin: { score: 0, hydration: 0, texture: 0, spots: 0, analysis: '' },
+    wrinkles: { score: 0, forehead: 0, eyesContour: 0, nasolabial: 0, analysis: '' },
+    dental: {
+      score: 74, whitening: 66, alignment: 84, gum: 78,
+      erosion: 70, sensitivity: 62, spacing: 80, overall_health: 74,
+      analysis: 'Dentição com alinhamento satisfatório e boa saúde estrutural. Tom levemente amarelado — ideal para clareamento profissional. Linha gengival simétrica e saudável. Desgaste leve nas bordas incisais superiores, típico de hábitos alimentares. Espaçamento adequado sem necessidade de aparelho. Sensibilidade moderada detectada na região dos incisivos.',
+    },
+    procedures: [
+      { name:'Clareamento Profissional', feasible:true, reason:'Tonalidade responde muito bem ao tratamento em consultório' },
+      { name:'Facetas de Porcelana',     feasible:true, reason:'Pode uniformizar tom e corrigir pequenas imperfeições' },
+      { name:'Lentes de Contato Dental', feasible:false, reason:'Alinhamento natural já muito satisfatório' },
+      { name:'Aparelho Transparente',    feasible:false, reason:'Alinhamento está dentro dos padrões estéticos ideais' },
+      { name:'Botox Gengival',           feasible:true, reason:'Reduz exposição gengival ao sorrir para resultado mais harmonioso' },
+      { name:'Resina Composta',          feasible:true, reason:'Indica para correção do desgaste incisal detectado' },
+    ],
+    tips: [
+      'Clareamento caseiro com moldeira personalizada + gel 10% — resultado em 2 semanas',
+      'Escove com pasta para sensibilidade + fio dental diariamente para saúde gengival',
+      'Evite alimentos pigmentantes (café, vinho, curry) nas 48h após qualquer procedimento',
+      'Use enxaguante bucal sem álcool — protege esmalte e controla placa bacteriana',
+      'Consulte um ortodontista para manutenção preventiva e polimento semestral',
+    ]
+  };
+}
+
 // ── RESULTS ───────────────────────────────────────────────────────
 let currentResult = null;
 function renderResults(r) {
   currentResult = r;
   goTo('s-results');
+  const isSmile = (r.scanType === 'smile' || scanMode === 'smile');
   const circ = 2*Math.PI*52;
   const offset = circ - (r.score/100)*circ;
-  const gc = r.score>=80?'var(--green)':r.score>=65?'var(--gold)':'var(--warn)';
+  const gc  = r.score>=80?'var(--green)':r.score>=65?'var(--gold)':'var(--warn)';
   const gbc = r.score>=80?'rgba(0,229,160,0.12)':r.score>=65?'rgba(201,168,76,0.12)':'rgba(255,107,74,0.12)';
+  const photoLabels = isSmile
+    ? ['SORRISO','DENTES SUP','MORDIDA']
+    : ['FRENTE','ESQ','DIR'];
+
+  // ── Stats bar ──
+  const statsBar = isSmile
+    ? `<div class="stats-bar">
+        <div class="stat-b"><div class="stat-n" style="color:var(--cyan)">${r.dental.whitening}</div><div class="stat-l">CLAREAMENTO</div></div>
+        <div class="stat-b"><div class="stat-n" style="color:var(--green)">${r.dental.alignment}</div><div class="stat-l">ALINHAMENTO</div></div>
+        <div class="stat-b"><div class="stat-n" style="color:var(--gold)">${r.dental.gum}</div><div class="stat-l">GENGIVA</div></div>
+        <div class="stat-b"><div class="stat-n" style="color:var(--warn)">${r.dental.sensitivity}</div><div class="stat-l">SENSIB.</div></div>
+      </div>`
+    : `<div class="stats-bar">
+        <div class="stat-b"><div class="stat-n" style="color:var(--gold)">${r.skin.score}</div><div class="stat-l">PELE</div></div>
+        <div class="stat-b"><div class="stat-n" style="color:var(--cyan)">${r.wrinkles.score}</div><div class="stat-l">RUGAS</div></div>
+        <div class="stat-b"><div class="stat-n" style="color:var(--green)">${r.dental.score}</div><div class="stat-l">DENTAL</div></div>
+      </div>`;
+
+  // ── Sections específicas ──
+  const faceSections = !isSmile ? `
+    <div class="res-sec">
+      <div class="sec-head">🔬 Análise da Pele</div>
+      <div class="res-card ${r.skin.score>=75?'rc-green':'rc-warn'}">
+        <div class="rc-head">
+          <div class="rc-icon">💧</div>
+          <div class="rc-title">Diagnóstico Cutâneo</div>
+          <div class="rc-badge ${r.skin.score>=75?'bg-green':r.skin.score>=60?'bg-gold':'bg-warn'}">${r.skin.score}/100</div>
+        </div>
+        <div class="rc-text">${r.skin.analysis}</div>
+        ${bar('Hidratação',r.skin.hydration,r.skin.hydration>=70?'bf-green':'bf-warn')}
+        ${bar('Textura',r.skin.texture,'bf-cyan')}
+        ${bar('Manchas / Uniformidade',r.skin.spots,r.skin.spots>=70?'bf-green':'bf-warn')}
+      </div>
+    </div>
+    <div class="res-sec">
+      <div class="sec-head">✨ Linhas & Rugas</div>
+      <div class="res-card ${r.wrinkles.score>=75?'rc-cyan':'rc-gold'}">
+        <div class="rc-head">
+          <div class="rc-icon">🪞</div>
+          <div class="rc-title">Mapeamento de Expressão</div>
+          <div class="rc-badge ${r.wrinkles.score>=75?'bg-cyan':r.wrinkles.score>=60?'bg-gold':'bg-warn'}">${r.wrinkles.score}/100</div>
+        </div>
+        <div class="rc-text">${r.wrinkles.analysis}</div>
+        ${bar('Testa',r.wrinkles.forehead,r.wrinkles.forehead>=70?'bf-green':'bf-warn')}
+        ${bar('Contorno dos olhos',r.wrinkles.eyesContour,r.wrinkles.eyesContour>=70?'bf-cyan':'bf-warn')}
+        ${bar('Sulcos nasolabiais',r.wrinkles.nasolabial,r.wrinkles.nasolabial>=70?'bf-green':'bf-gold')}
+      </div>
+    </div>
+    <div class="res-sec">
+      <div class="sec-head">😁 Saúde Dental</div>
+      <div class="res-card ${r.dental.score>=75?'rc-green':'rc-gold'}">
+        <div class="rc-head">
+          <div class="rc-icon">🦷</div>
+          <div class="rc-title">Avaliação Dental</div>
+          <div class="rc-badge ${r.dental.score>=75?'bg-green':r.dental.score>=60?'bg-gold':'bg-warn'}">${r.dental.score}/100</div>
+        </div>
+        <div class="rc-text">${r.dental.analysis}</div>
+        ${bar('Clareamento',r.dental.whitening,r.dental.whitening>=70?'bf-green':'bf-gold')}
+        ${bar('Alinhamento',r.dental.alignment,r.dental.alignment>=70?'bf-cyan':'bf-warn')}
+        ${bar('Saúde Gengival',r.dental.gum||80,r.dental.gum>=70?'bf-green':'bf-warn')}
+      </div>
+    </div>` : '';
+
+  const smileSection = isSmile ? `
+    <div class="res-sec">
+      <div class="sec-head">🦷 Diagnóstico Dental Completo</div>
+      <div class="res-card ${r.dental.score>=75?'rc-cyan':'rc-gold'}">
+        <div class="rc-head">
+          <div class="rc-icon">🔬</div>
+          <div class="rc-title">Análise Odontológica por IA</div>
+          <div class="rc-badge ${r.dental.score>=75?'bg-cyan':r.dental.score>=60?'bg-gold':'bg-warn'}">${r.dental.score}/100</div>
+        </div>
+        <div class="rc-text">${r.dental.analysis}</div>
+        ${bar('Tonalidade / Clareamento', r.dental.whitening,  r.dental.whitening>=70?'bf-green':'bf-gold')}
+        ${bar('Alinhamento & Espaçamento',r.dental.alignment,  r.dental.alignment>=70?'bf-cyan':'bf-warn')}
+        ${bar('Saúde Gengival',           r.dental.gum,        r.dental.gum>=70?'bf-green':'bf-warn')}
+        ${bar('Desgaste do Esmalte',      r.dental.erosion||70, (r.dental.erosion||70)>=70?'bf-green':'bf-gold')}
+        ${bar('Sensibilidade Detectada',  r.dental.sensitivity||65, (r.dental.sensitivity||65)>=70?'bf-green':'bf-warn')}
+        ${bar('Espaçamento Interdental',  r.dental.spacing||80, (r.dental.spacing||80)>=70?'bf-cyan':'bf-gold')}
+      </div>
+    </div>
+    <div class="res-sec">
+      <div class="sec-head">🌟 Potencial de Transformação</div>
+      <div class="res-card rc-green">
+        <div class="rc-head">
+          <div class="rc-icon">✨</div>
+          <div class="rc-title">Resultado Esperado com Tratamento</div>
+        </div>
+        <div class="rc-text" style="margin-bottom:12px;">Com os procedimentos indicados, seu sorriso pode atingir até <strong style="color:var(--green);">92/100</strong> em 3 meses.</div>
+        <div style="display:flex;gap:12px;">
+          <div style="flex:1;text-align:center;background:rgba(0,229,160,0.06);border:1px solid rgba(0,229,160,0.2);border-radius:12px;padding:14px 8px;">
+            <div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--green);">${r.dental.whitening}</div>
+            <div style="font-size:10px;color:var(--text-dim);letter-spacing:1px;margin-top:3px;">ATUAL</div>
+            <div style="font-size:9px;color:var(--text-dim);">Tonalidade</div>
+          </div>
+          <div style="display:flex;align-items:center;font-size:20px;color:var(--text-dim);">→</div>
+          <div style="flex:1;text-align:center;background:rgba(0,229,160,0.12);border:1px solid rgba(0,229,160,0.4);border-radius:12px;padding:14px 8px;">
+            <div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--green);">92</div>
+            <div style="font-size:10px;color:var(--green);letter-spacing:1px;margin-top:3px;">PÓS-TRAT.</div>
+            <div style="font-size:9px;color:var(--text-dim);">Tonalidade</div>
+          </div>
+        </div>
+      </div>
+    </div>` : '';
 
   document.getElementById('resContent').innerHTML = `
     <div class="res-hero">
+      <div style="font-family:'Rajdhani',sans-serif;font-size:10px;letter-spacing:3px;color:${isSmile?'var(--cyan)':'var(--gold)'};margin-bottom:8px;text-align:center;">${isSmile?'ANÁLISE DO SORRISO':'ANÁLISE FACIAL'} · BELEZ-AI</div>
       <div class="score-wrap">
         <div class="score-ring-svg" style="width:120px;height:120px;">
           <svg width="120" height="120" viewBox="0 0 120 120">
@@ -1274,14 +1794,10 @@ function renderResults(r) {
       </div>
       <div class="res-grade" style="color:${gc};background:${gbc};border:1px solid ${gc}40;">${r.grade}</div>
       <div class="res-summary">${r.summary}</div>
-      <div class="res-meta">Idade estimada: <strong>${r.age_estimated} anos</strong> &nbsp;·&nbsp; Tom: <strong>${r.skin_tone}</strong></div>
+      <div class="res-meta">Idade estimada: <strong>${r.age_estimated} anos</strong> &nbsp;·&nbsp; ${isSmile?'Saúde geral':'Tom'}: <strong>${isSmile?r.dental.overall_health+'/100':r.skin_tone}</strong></div>
     </div>
 
-    <div class="stats-bar">
-      <div class="stat-b"><div class="stat-n" style="color:var(--gold)">${r.skin.score}</div><div class="stat-l">PELE</div></div>
-      <div class="stat-b"><div class="stat-n" style="color:var(--cyan)">${r.wrinkles.score}</div><div class="stat-l">RUGAS</div></div>
-      <div class="stat-b"><div class="stat-n" style="color:var(--green)">${r.dental.score}</div><div class="stat-l">DENTAL</div></div>
-    </div>
+    ${statsBar}
 
     <div class="res-sec" style="padding-top:16px;">
       <div class="sec-head">Fotos capturadas</div>
@@ -1290,62 +1806,21 @@ function renderResults(r) {
       ${photos.map((p,i)=>`
         <div class="ph-wrap">
           <div class="ph-img"><img src="${p}"></div>
-          <div class="ph-lbl">${['FRENTE','ESQ','DIR'][i]}</div>
+          <div class="ph-lbl">${photoLabels[i]||'CAPTURA '+(i+1)}</div>
         </div>`).join('')}
     </div>
 
-    <div class="res-sec">
-      <div class="sec-head">🔬 Análise da Pele</div>
-      <div class="res-card ${r.skin.score>=75?'rc-green':'rc-warn'}">
-        <div class="rc-head">
-          <div class="rc-icon">💧</div>
-          <div class="rc-title">Diagnóstico Cutâneo</div>
-          <div class="rc-badge ${r.skin.score>=75?'bg-green':r.skin.score>=60?'bg-gold':'bg-warn'}">${r.skin.score}/100</div>
-        </div>
-        <div class="rc-text">${r.skin.analysis}</div>
-        ${bar('Hidratação',r.skin.hydration,r.skin.hydration>=70?'bf-green':'bf-warn')}
-        ${bar('Textura',r.skin.texture,'bf-cyan')}
-        ${bar('Manchas / Uniformidade',r.skin.spots,r.skin.spots>=70?'bf-green':'bf-warn')}
-      </div>
-    </div>
+    ${faceSections}
+    ${smileSection}
 
     <div class="res-sec">
-      <div class="sec-head">✨ Linhas & Rugas</div>
-      <div class="res-card ${r.wrinkles.score>=75?'rc-cyan':'rc-gold'}">
-        <div class="rc-head">
-          <div class="rc-icon">🪞</div>
-          <div class="rc-title">Mapeamento de Expressão</div>
-          <div class="rc-badge ${r.wrinkles.score>=75?'bg-cyan':r.wrinkles.score>=60?'bg-gold':'bg-warn'}">${r.wrinkles.score}/100</div>
-        </div>
-        <div class="rc-text">${r.wrinkles.analysis}</div>
-        ${bar('Testa',r.wrinkles.forehead,r.wrinkles.forehead>=70?'bf-green':'bf-warn')}
-        ${bar('Contorno dos olhos',r.wrinkles.eyesContour,r.wrinkles.eyesContour>=70?'bf-cyan':'bf-warn')}
-        ${bar('Sulcos nasolabiais',r.wrinkles.nasolabial,r.wrinkles.nasolabial>=70?'bf-green':'bf-gold')}
-      </div>
-    </div>
-
-    <div class="res-sec">
-      <div class="sec-head">😁 Saúde Dental</div>
-      <div class="res-card ${r.dental.score>=75?'rc-green':'rc-gold'}">
-        <div class="rc-head">
-          <div class="rc-icon">🦷</div>
-          <div class="rc-title">Avaliação Dental</div>
-          <div class="rc-badge ${r.dental.score>=75?'bg-green':r.dental.score>=60?'bg-gold':'bg-warn'}">${r.dental.score}/100</div>
-        </div>
-        <div class="rc-text">${r.dental.analysis}</div>
-        ${bar('Clareamento',r.dental.whitening,r.dental.whitening>=70?'bf-green':'bf-gold')}
-        ${bar('Alinhamento',r.dental.alignment,r.dental.alignment>=70?'bf-cyan':'bf-warn')}
-      </div>
-    </div>
-
-    <div class="res-sec">
-      <div class="sec-head">💎 Procedimentos Estéticos</div>
+      <div class="sec-head">💎 Procedimentos ${isSmile?'Odontológicos':'Estéticos'}</div>
       <div class="res-card rc-gold">
         <div class="rc-head"><div class="rc-icon">🏥</div><div class="rc-title">Recomendações Personalizadas</div></div>
         <div class="rc-text" style="margin-bottom:14px;">Baseado na sua análise individual, nossa IA recomenda:</div>
         <div class="proc-wrap">
           ${r.procedures.map(p=>`
-            <div class="proc-chip ${p.feasible?'pc-yes':'pc-no'}" onclick="toast('${p.reason}','')">
+            <div class="proc-chip ${p.feasible?'pc-yes':'pc-no'}" onclick="toast('${p.reason.replace(/'/g,"'")}','')">
               <span>${p.feasible?'✓':'✗'}</span>${p.name}
             </div>`).join('')}
         </div>
@@ -1354,7 +1829,7 @@ function renderResults(r) {
     </div>
 
     <div class="res-sec">
-      <div class="sec-head">💡 Rotina Recomendada</div>
+      <div class="sec-head">💡 ${isSmile?'Rotina de Cuidado Dental':'Rotina Recomendada'}</div>
       <div class="res-card rc-cyan">
         <div class="rc-head"><div class="rc-icon">🌟</div><div class="rc-title">Cuidados Personalizados</div></div>
         <div class="tips-list" style="margin-top:6px;">
@@ -1402,7 +1877,7 @@ function animNum(id, from, to, dur) {
   requestAnimationFrame(tick);
 }
 
-function novaAnalise() { step=0; photos=[]; goTo('s-intro'); }
+function novaAnalise() { step=0; photos=[]; scanMode='face'; stopQualityCheck(); goTo('s-intro'); }
 function share() {
   if(navigator.share) navigator.share({title:'Minha Análise BELEZ-AI',text:'Fiz minha análise facial com IA no BELEZ-AI pelo app Fala Brasil! 🔬✨'}).catch(()=>{});
   else toast('Compartilhamento não disponível neste dispositivo','');
